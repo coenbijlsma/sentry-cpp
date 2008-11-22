@@ -3,43 +3,34 @@
 
 #include "IPlugin.h"
 #include "NoSuchLibraryException.h"
+#include "NoSuchSymbolException.h"
 #include <string>
+#include <map>
 
 using std::string;
+using std::map;
 
 class PluginLoader {
 private:
-
-    /* The library the plug-in resides in */
-    void* _lib;
-    
-    /* The actual plug-in */
-    IPlugin* _plugin;
+    /**
+     * @brief loads the library in libpath.
+     */
+    static void* _getLib(string libpath) throw(NoSuchLibraryException);
     
 public:
 
     /**
-     * Loads the plug-in from the library
-     * @brief Constructor
-     * @throws NoSuchLibraryException If the library is not found.
-     * @throws NoSuchSymbolException If the library is found, but the 
-     *	       symbol doesn't exist.
-     */
-    PluginLoader(string libpath) throw(NoSuchLibraryException, NoSuchSymbolException);
-    
-    /**
-     * Also unloads the plug-in
-     * @brief Destructor.
-     */
-    virtual ~PluginLoader();
-    
-    /**
-     * @brief Returns the loaded
+     * @brief Returns the loaded plug-in
      * @return IPlugin* The loaded plug-in.
      * @see IPlugin.h
      */
-    IPlugin* getPlugin() throw();
+    static IPlugin* loadPlugin(string libpath) throw(NoSuchLibraryException, NoSuchSymbolException);
     
+    /**
+     * @brief Unloads the provided plug-in.
+     * @return bool Whether unloading the plug-in succeeded.
+     */
+    static bool unloadPlugin(IPlugin* plugin, string libpath) throw(NoSuchLibraryException, NoSuchSymbolException);
 };
 
 #endif

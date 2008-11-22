@@ -6,12 +6,14 @@
 
 using std::string;
 
+class IPlugin;
+
 class IPluginCommand {
 public:
-    IPlugin* getPlugin() =0;
-    string getName() =0;
-    string getHookPoint() =0;
-    void execute() =0;
+    virtual IPlugin* getPlugin() =0;
+    virtual string getName() =0;
+    virtual string getHookPoint() =0;
+    virtual void execute() =0;
 };
 
 #endif

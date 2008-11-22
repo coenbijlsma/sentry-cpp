@@ -1,61 +1,65 @@
-#include "PluginLoader.h" 
-#include "Logger.h"
+#include "PluginLoader.h"
 #include <dlfcn.h>
+#include <iostream>
 
-PluginLoader::PluginLoader(string libpath){
-    Logger::log("loading library" + libpath + " from PluginLoader::PluginLoader");
-    _lib = dlopen(libpath.c_str(), RTLD_LAZY);
-    const char* dlsym_error = 0;
+using std::cerr;
+using std::cout;
+using std::endl;
+
+void* PluginLoader::_getLib(string libpath) throw (NoSuchLibraryException){
+    void* lib = dlopen(libpath.c_str(), RTLD_LAZY);
     
-    if( ! _lib){
-	Logger::log( string(dlerror()) + libpath );
-	
-	// reset dlerror()
-	dlerror();
-	throw NoSuchLibraryException;
+    if( ! lib ){
+	cerr << dlerror() << endl;
+	throw NoSuchLibraryException();
     }
     
+    return lib;
+}
+
+IPlugin* PluginLoader::loadPlugin(string libpath) throw (NoSuchLibraryException, NoSuchSymbolException){
+    void* lib = _getLib(libpath);
+    
     /* Load the create symbol */
-    create_t* create_plugin = (create_t*) dlsym(_lib, "create_plugin");
-    dlsym_error = dlerror();
+    create_t* create_plugin = (create_t*) dlsym(lib, "create");
+    const char* dlsym_error = dlerror();
     
     if(dlsym_error){
-	Logger::log( string(dlsym_error) + libpath );
-	dlclose(_lib);
+	cerr << dlsym_error << endl;
+	dlclose(lib);
 	
 	// reset dlerror
 	dlerror();
 	
-	throw NoSuchSymbolException;
+	throw NoSuchSymbolException();
     }
 
-    _plugin = (IPlugin*)create_plugin();    
-    Logger::log("Successfully loaded library " + libpath );
+    return (IPlugin*)create_plugin();
 }
 
-PluginLoader::~PluginLoader(){
-    destroy_t* destroy_plugin = (destroy_t*) dlsym(_lib, "destroy_plugin");
+bool PluginLoader::unloadPlugin(IPlugin* plugin, string libpath) throw (NoSuchLibraryException, NoSuchSymbolException){
+    void* lib = _getLib(libpath);
+    
+    destroy_t* destroy_plugin = (destroy_t*) dlsym(lib, "destroy");
     const char* dlsym_error = dlerror();
     
     if(dlsym_error){
-	Logger::log( string(dlsym_error) );
+	cerr << dlsym_error << endl;
 	
 	// reset dlerror()
 	dlerror();
 	
 	/* If the destroy method cannot be loaded, delete the plug-in */
-	delete _plugin;
+	delete plugin;
+	
+	throw NoSuchSymbolException();
     }else{
-	destroy_plugin(_plugin);
+	destroy_plugin( plugin );
     }
     
-    if(dlclose(_lib) != 0){
-	Logger::log("Could not unload plugin library");
+    if(dlclose(lib) != 0){
+	cerr << "Could not unload plugin library" << endl;
     }else{
-	Logger::log("Successfully unloaded plugin library");
+	cout << "Successfully unloaded plugin library" << endl;
     }
-}
-
-IPlugin* PluginLoader::getPlugin() {
-    return _plugin;
 }

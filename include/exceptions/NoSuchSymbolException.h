@@ -3,6 +3,8 @@
 
 #include <exception>
 
+using std::exception;
+
 class NoSuchSymbolException : public exception {
 public:
     

@@ -1,0 +1,30 @@
+#ifndef IHOOKPOINT_H
+#define IHOOKPOINT_H
+
+#include <vector>
+#include <string>
+
+using std::string;
+using std::vector;
+
+class IHookPoint {
+public:
+    /**
+     * Returns the hookpoint's name. To avoid name collisions, hookpoint names
+     * must be in the form <plugin_name>.<hookpoint_name>
+     * For example, the hookpoint for sentry's core after startup 
+     * is "core.post_startup"
+     * @brief Returns the name of the hookpoint.
+     */
+    virtual string getName() =0;
+
+    /**
+     * Returns the names of the plug-in commands that 
+     * are attached to this hookpoint. If no commands are
+     * attached, this method returns an empty vector.
+     * @brief Returns the attached plug-in commands.
+     */
+    virtual vector<string> getAttachedPluginCommands() =0;
+};
+
+#endif
