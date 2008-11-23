@@ -6,6 +6,7 @@ using std::cerr;
 using std::cout;
 using std::endl;
 
+/* Retrieve the library from the given path */
 void* PluginLoader::_getLib(string libpath) throw (NoSuchLibraryException){
     void* lib = dlopen(libpath.c_str(), RTLD_LAZY);
     
@@ -17,6 +18,7 @@ void* PluginLoader::_getLib(string libpath) throw (NoSuchLibraryException){
     return lib;
 }
 
+/* Loads the plug-in from the given path */
 IPlugin* PluginLoader::loadPlugin(string libpath) throw (NoSuchLibraryException, NoSuchSymbolException){
     void* lib = _getLib(libpath);
     
@@ -37,6 +39,7 @@ IPlugin* PluginLoader::loadPlugin(string libpath) throw (NoSuchLibraryException,
     return (IPlugin*)create_plugin();
 }
 
+/* Destroys the given IPlugin, which has to reside in the library in the given path */
 bool PluginLoader::unloadPlugin(IPlugin* plugin, string libpath) throw (NoSuchLibraryException, NoSuchSymbolException){
     void* lib = _getLib(libpath);
     
