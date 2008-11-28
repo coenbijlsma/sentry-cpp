@@ -14,17 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with Sentry.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef LOGGER_H
-#define LOGGER_H
+#include "IPlugin.h"
+#include "IHookPoint.h"
+#include "IPluginCommand.h"
 
+#include <vector>
 #include <string>
 
 using std::string;
+using std::vector;
 
-class Logger {
+class TestPlugin : public IPlugin {
+private:
+    string _name;
+    vector<IHookPoint*> _hookpoints;
+    vector<string> _dependencies;
+    vector<IPluginCommand*> _commands;
+        
+public:
 
-static void log(string message);
-
+    TestPlugin(string name);
+    virtual ~TestPlugin();
+    
+    string getName();
+    
+    vector<IHookPoint*> getProvidingHookPoints();
+    
+    vector<string> getDependencies();
+    
+    vector<IPluginCommand*> getCommands();
+    
 };
 
-#endif
+//typedef IPlugin* create_plugin_t();
+//typedef bool destroy_plugin_t(IPlugin* plugin);

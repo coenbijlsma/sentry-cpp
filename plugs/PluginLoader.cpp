@@ -23,7 +23,7 @@ IPlugin* PluginLoader::loadPlugin(string libpath) throw (NoSuchLibraryException,
     void* lib = _getLib(libpath);
     
     /* Load the create symbol */
-    create_t* create_plugin = (create_t*) dlsym(lib, "create");
+    create_plugin_t* create_plugin = (create_plugin_t*) dlsym(lib, "create_plugin");
     const char* dlsym_error = dlerror();
     
     if(dlsym_error){
@@ -34,6 +34,8 @@ IPlugin* PluginLoader::loadPlugin(string libpath) throw (NoSuchLibraryException,
 	dlerror();
 	
 	throw NoSuchSymbolException();
+    }else{
+	cout << "Successfully loaded plugin " << libpath << endl;
     }
 
     return (IPlugin*)create_plugin();
@@ -43,7 +45,7 @@ IPlugin* PluginLoader::loadPlugin(string libpath) throw (NoSuchLibraryException,
 bool PluginLoader::unloadPlugin(IPlugin* plugin, string libpath) throw (NoSuchLibraryException, NoSuchSymbolException){
     void* lib = _getLib(libpath);
     
-    destroy_t* destroy_plugin = (destroy_t*) dlsym(lib, "destroy");
+    destroy_plugin_t* destroy_plugin = (destroy_plugin_t*) dlsym(lib, "destroy_plugin");
     const char* dlsym_error = dlerror();
     
     if(dlsym_error){
@@ -61,8 +63,8 @@ bool PluginLoader::unloadPlugin(IPlugin* plugin, string libpath) throw (NoSuchLi
     }
     
     if(dlclose(lib) != 0){
-	cerr << "Could not unload plugin library" << endl;
+	cerr << "Could not unload plugin " << libpath << endl;
     }else{
-	cout << "Successfully unloaded plugin library" << endl;
+	cout << "Successfully unloaded plugin " << libpath << endl;
     }
 }
