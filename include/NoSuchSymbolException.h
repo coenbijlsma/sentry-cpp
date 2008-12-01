@@ -21,6 +21,13 @@
 
 using std::exception;
 
+/**
+ * @author Coen Bijlsma
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
+ * @since 2008-11-20
+ * @version 0.1
+ * @brief Exception class in case a symbol is not found.
+ */
 class NoSuchSymbolException : public exception {
 public:
     

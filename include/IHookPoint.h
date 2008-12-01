@@ -25,7 +25,8 @@ using std::vector;
 
 /**
  * @brief Interface for hookpoints.
- * @copyright 2008 by Coen Bijlsma
+ * @author Coen Bijlsma
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
  * @since 2008-11-20
  * @version 0.1
  *
@@ -42,7 +43,7 @@ using std::vector;
 class IHookPoint {
 public:
     /**
-     * Returns the hookpoint's name. To avoid name collisions, hookpoint names
+     * Returns the hookpoint's name. To avoid ambiguous names, hookpoint names
      * must be in the form <plugin_name>.<hookpoint_name>
      * For example, the hookpoint for sentry's core after startup 
      * is "core.post_startup"

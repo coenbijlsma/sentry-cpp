@@ -21,9 +21,20 @@
 
 using std::string;
 
+/**
+ * @author Coen Bijlsma
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
+ * @since 2008-11-20
+ * @version 0.1
+ * @deprecated To be replaced by log4cpp
+ * @brief This class logs the given messages.
+ *
+ */
 class Logger {
+public:
 
-static void log(string message);
+    static enum log_level_t {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_FATAL};
+    static void log(string message, log_level_t log_level);
 
 };
 

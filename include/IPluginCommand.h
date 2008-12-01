@@ -19,17 +19,47 @@
 
 #include "IPlugin.h"
 #include <string>
+#include <vector>
 
 using std::string;
+using std::vector;
 
 class IPlugin;
 
+/**
+ * @author Coen Bijlsma
+ * @copyright Copyright (C) 2008 by Coen Bijlsma 
+ * @since 2008-11-20
+ * @version 0.1
+ *
+ * This interface is used by Sentry to work with plug-in commands.
+ * If you want to write your own plug-ins, you have to implement this
+ * interface.
+ */
 class IPluginCommand {
 public:
+    
+    /**
+     * @brief Returns the IPlugin* this IPluginCommand* belongs to.
+     */
     virtual IPlugin* getPlugin() =0;
+    
+    /**
+     * @brief Returns the name of this command.
+     * To avoid ambiguous command names, the names must
+     * be in the form <plugin_name>.<command_name>
+     */
     virtual string getName() =0;
+    
+    /**
+     * @brief The name of the hookpoint this command is attached to.
+     */
     virtual string getHookPoint() =0;
-    virtual void execute() =0;
+    
+    /**
+     * @brief Executes the command with the given parameters.
+     */
+    virtual void execute(vector<string> params) =0;
 };
 
 #endif

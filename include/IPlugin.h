@@ -26,19 +26,29 @@ using std::string;
 using std::vector;
 
 /**
+ * @author Coen Bijlsma
+ * @copyright Copyright (C) 2008 by Coen Bijlsma 
+ * @since 2008-11-20
+ * @version 0.1
  * @brief Interface for plug-ins.
- * Remember to clean up your own IHookpoint*s!
+ *
+ * Sentry uses this interface to work with plug-ins.
+ * If you want to create your own plug-ins, you have
+ * to implement this interface and create a shared library
+ * that has to reside in the plug-ins directory of Sentry.
+ * Remember to clean up your own IHookpoint*s, because
+ * Sentry doesn't to that kind of cleanup for you.
  */
 class IPlugin {
 public:
 
     /**
-     * Returns the name of this plug-in.
+     * @brief Returns the name of this plug-in.
      */
     virtual string getName() =0;
     
     /**
-     * Returns the hookpoints this plug-in provides.
+     * @brief Returns the hookpoints this plug-in provides.
      */
     virtual vector<IHookPoint*> getProvidingHookPoints() =0;
     

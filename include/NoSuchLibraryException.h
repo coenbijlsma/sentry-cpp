@@ -21,6 +21,13 @@
 
 using std::exception;
 
+/**
+ * @author Coen Bijlsma
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
+ * @version 0.1
+ * @since 2008-11-20
+ * @brief Exception class in case a library doesn't exist.
+ */
 class NoSuchLibraryException : public exception {
 public:
     

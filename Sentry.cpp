@@ -16,7 +16,7 @@ Sentry::Sentry(){
     /* Load the hookpoints that Sentry itself provides */
     _setupHookpoints();
     
-    string plugindir = "./plugs/";
+    string plugindir("./plugs/");
     vector<string> files = _getPluginLibNames(plugindir); // XXX replace by configged value
     
     /* Load the plug-ins */
@@ -50,9 +50,6 @@ Sentry::Sentry(){
 /* Destructor */
 Sentry::~Sentry(){
 
-    /* Clear the hookpoints */
-    _hookpoints.clear();
-    
     /* Unload the plug-ins */
     for(map<string, IPlugin*>::iterator it = _plugins.begin(); it != _plugins.end(); it++){
 	IPlugin* plugin = it->second;
@@ -84,8 +81,8 @@ vector<string> Sentry::_getPluginLibNames(string directory){
 /* Sets up the hookpoints for the Sentry core */
 void Sentry::_setupHookpoints(){
     // XXX figure out if map.clear() also calls destructors of contained objects
-    SentryHookPoint* postStartup = new SentryHookPoint("sentry.core.post_startup");
-    SentryHookPoint* preShutdown = new SentryHookPoint("sentry.core.pre_shutdown");
+    SentryHookPoint* postStartup = new SentryHookPoint(string("core.post_startup"));
+    SentryHookPoint* preShutdown = new SentryHookPoint(string("core.pre_shutdown"));
     
     _hookpoints[postStartup->getName()] = postStartup;
     _hookpoints[preSHutdown->getName()] = preShutdown;
