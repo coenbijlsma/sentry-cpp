@@ -17,11 +17,12 @@
 #ifndef IHOOKPOINT_H
 #define IHOOKPOINT_H
 
-#include <vector>
+#include "IPluginCommand.h"
+#include <map>
 #include <string>
 
 using std::string;
-using std::vector;
+using std::map;
 
 /**
  * @brief Interface for hookpoints.
@@ -57,23 +58,30 @@ public:
      * attached, this method returns an empty vector.
      * @brief Returns the attached plug-in commands.
      */
-    virtual vector<string> getAttachedPluginCommands() =0;
+    virtual map<string, IPluginCommand*> getAttachedPluginCommands() =0;
+    
+    /**
+     * Returns the IPluginCommand* that has the given name.
+     * If that command does not exist, 0 is returned.
+     * @brief Finds a IPluginCommand* by name.
+     */
+    virtual IPluginCommand* findPluginCommand(string name) =0;
     
     /**
      * Adds the given plug-in command to the list of attached
      * plug-in commands.
      * If the command already exists, this method has no effect.
      */
-    virtual void addPluginCommand(string name) =0;
+    virtual void attach(IPluginCommand* command) =0;
     
     /**
-     * Removes the given name from the list of attached plug-in commands.
+     * Removes the given command from the list of attached plug-in commands.
      * If the name does not exist in the list, nothing happens and
-     * true is returned.
+     * true is returned. For now.
      * @brief Removes a plug-in command.
      * @return bool Whether removing the name has succeeded.
      */
-    virtual bool removePluginCommand(string name) =0;
+    virtual bool detach(IPluginCommand* command) =0;
 };
 
 #endif

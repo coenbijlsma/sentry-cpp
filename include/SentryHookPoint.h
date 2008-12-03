@@ -18,18 +18,31 @@
 #define SENTRYHOOKPOINT_H
 
 #include "IHookPoint.h"
+#include "IPluginCommand.h"
 #include <string>
-#include <vector>
+#include <map>
 
 using std::string;
-using std::vector;
+using std::map;
 
+/**
+ * @brief HookPoint implementation for Sentry.
+ * @author Coen Bijlsma
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
+ * @since 2008-11-20
+ * @version 0.1
+ * @see Sentry.h
+ *
+ * This class is an implementation of the IHookPoint interface.
+ * Sentry provides a number of hookpoints; you can find their
+ * descriptions in the Sentry.h file.
+ */
 class SentryHookPoint : public IHookPoint {
 private:
     string _name;
-    vector<string> _attachedPluginCommands;
+    map<string, IPluginCommand*> _attachedPluginCommands;
     
-    vector<string>::iterator _findPluginCommand(string name);
+    map<string, IPluginCommand*>::iterator _findPluginCommand(string name);
 public:
     
     /**
@@ -44,24 +57,30 @@ public:
     virtual ~SentryHookPoint();
     
     /**
-     * @brief Returns the name of thie hookpoint.
+     * @brief Returns the name of this hookpoint.
      */
     string getName() throw();
     
     /**
      * @brief Returns the attached plug-in commands.
      */
-    vector<string> getAttachedPluginCommands() throw();
+    map<string, IPluginCommand*> getAttachedPluginCommands() throw();
+    
+    /**
+     * @brief Returns the IPluginCommand with the given name.
+     */
+    IPluginCommand* findPluginCommand(string name) throw();
+    
     
     /**
      * @brief Adds the given plug-in command to the list.
      */
-    void addPluginCommand(string name) throw();
+    void attach(IPluginCommand* command) throw();
     
     /**
      * @brief Removes the given plug-in command from the list.
      */
-    bool removePluginCommand(string name) throw();
+    bool detach(IPluginCommand* command) throw();
 };
 
 #endif

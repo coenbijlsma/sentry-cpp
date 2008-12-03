@@ -7,12 +7,14 @@ SentryHookPoint::SentryHookPoint(string name) throw(){
 
 /* Destructor */
 SentryHookPoint::~SentryHookPoint(){
+    // DO NOT delete THESE IPluginCommand*s, they might be needed elsewhere!
     _attachedPluginCommands.clear();
 }
 
 /* Returns the iterator to the searched-for command */
-vector<string>::iterator SentryHookPoint::_findPluginCommand(string name){
+map<string, IPluginCommand*>::iterator SentryHookPoint::_findPluginCommand(string name){
     for(vector<string>::iterator it = _attachedPluginCommands.begin(); it != _attachedPluginCommands.end(); it++){
+	
 	if( *it == name ){
 	    return it;
 	}

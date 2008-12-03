@@ -34,6 +34,8 @@ private:
     map<string, IPlugin*> _plugins;
     
     vector<string> _getPluginLibNames(string directory);
+    
+    IHookPoint* _findHookPoint(string name);
     void _setupHookpoints();
     
 public:
