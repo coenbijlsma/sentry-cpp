@@ -14,55 +14,57 @@
  * You should have received a copy of the GNU General Public License
  * along with Sentry.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef SENTRYCONFIGSECTION_H
-#define	SENTRYCONFIGSECTION_H
+#ifndef STRINGTOKENIZER_H
+#define STRINGTOKENIZER_H
 
+#include <stdio.h>
+#include <string.h>
 #include <string>
-#include <map>
+#include <stdlib.h>
 
 using std::string;
-using std::map;
 
-class SentryConfigSection {
+class StringTokenizer {
 private:
-        string _name;
-        map<string, string> _entries;
+        char* _sequence;
+        char _delimeter;
+
+        int _currentLoc;
+        int _count;
+        char* _currentToken;
+        char* _nextToken;
 
 public:
 
         /*
          * Constructor.
+         * Initializes the tokenizer and its tokens.
          */
-        SentryConfigSection(string name);
+        StringTokenizer(string seq, char delim);
 
         /*
-         * Destructor. Does nothing at this time.
+         * Destructor.
+         * Cleans up and exits.
          */
-        virtual ~SentryConfigSection();
+        virtual ~StringTokenizer();
 
         /*
-         * Returns the name of this SentryConfigSection
+         * Returns whether there are any tokens left
+         * after the current position.
          */
-        string getName();
+        bool hasNext();
 
         /*
-         * Returns the value of the requested setting.
-         * If the setting does not exist, an empty
-         * string is returned.
+         * Returns tne amount of tokens there are
+         * in the string.
          */
-        string get(string setting);
+        int count();
 
         /*
-         * Sets or creates the setting with the
-         * provided value.
+         * Returns the next token after
+         * the current position.
          */
-        void set(string setting, string value);
-
-        /*
-         * Returns all the entries for this SentryConfigSection.
-         */
-        map<string, string> all();
+        string next();
 };
 
-
-#endif	/* SENTRYCONFIGSECTION_H */
+#endif /* STRINGTOKENIZER_H */
