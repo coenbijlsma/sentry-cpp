@@ -5,12 +5,12 @@
 #include <vector>
 #include <dirent.h> /* For reading the plug-in directory */
 #include <string.h> /* For strcmp */
-#include <libconfig.h++> /* for libconfig */
+//#include <libconfig.h++> /* for libconfig */
 
 using std::vector;
-using std::cerr;
-using std::cout;
-using std::endl;
+//using std::cerr;
+//using std::cout;
+//using std::endl;
 
 /* Construcor */
 Sentry::Sentry(){
@@ -39,16 +39,16 @@ Sentry::Sentry(){
 		    if( _findHookPoint(hookpoint->getName()) == 0 ){
 			_hookpoints[hookpoint->getName()] = hookpoint;
 		    }else{
-			cerr << "Ignoring already available hookpoint " << hookpoint->getName() << endl;
+                        Logger::log("Ignoring already available hookpoint " + hookpoint->getName(), Logger::LOG_WARNING);
 		    }
 		}
 	    }
 	}
 	catch(NoSuchLibraryException& nsle){
-	    cerr << nsle.what() << endl;
+            Logger::log(nsle.what(), Logger::LOG_ERROR);
 	}
 	catch(NoSuchSymbolException& nsse){
-	    cerr << nsse.what() << endl;
+            Logger::log(nsse.what(), Logger::LOG_ERROR);
 	}
 	    
     }
@@ -57,12 +57,9 @@ Sentry::Sentry(){
     IHookPoint* post_startup = _findHookPoint("core.post_startup");
     
     if( ! post_startup ){
-	cerr << "Could not find hookpoint core.post_startup");
+        Logger::log("Could not find hookpoint core.post_startup", Logger::LOG_ERROR);
     }else{
-	// XXX execute the commands in post_startup
-	// Note that these commands get an empty parameter-list!
-	// because, how should I know what paremeters are needed?
-	// I'm not a wizard, you know.
+        _executeCommandsIn(post_startup);
     }
     
 }
@@ -104,7 +101,7 @@ vector<string> Sentry::_getPluginLibNames(string directory){
 	    }
 	}
     }else{
-	cerr << "Could not open directory " << directory << endl;
+        Logger::log("Could not open directory " + directory, Logger::LOG_ERROR);
     }
 	 
     return ret;
@@ -118,4 +115,18 @@ void Sentry::_setupHookpoints(){
         
     _hookpoints[postStartup->getName()] = postStartup;
     _hookpoints[preSHutdown->getName()] = preShutdown;
+}
+
+/* Executes the commands in the given hookpoint */
+void Sentry::_executeCommandsIn(const IHookPoint* hp){
+    map<string, IPluginCommand*> commands = hp->getAttachedPluginCommands();
+    map<string, IPluginCommand*>::iterator it = commands.begin();
+    vector<string> not_used;
+
+    for(; it != hp->getAttachedPluginCommands().begin(); it++){
+        IPluginCommand* command = it->second;
+        if(command != 0){
+            command->execute(not_used);
+        }
+    }
 }

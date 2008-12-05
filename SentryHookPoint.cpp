@@ -33,17 +33,27 @@ vector<string> SentryHookPoint::getAttachedPluginCommands() throw(){
     return _attachedPluginCommands;
 }
 
+/* Returns the IPluginCommand that has the given name */
+IPluginCommand* SentryHookPoint::findPluginCommand(string name) throw() {
+    map<string, IPluginCommand*>::iterator it = _findPluginCommand(name);
+
+    if(it == _attachedPluginCommands.end()){
+        return (IPluginCommand*)0;
+    }
+    return it->second;
+}
+
 /* Adds a plug-in command to the list */
-void SentryHookPoint::addPluginCommand(string name) throw(){
+void SentryHookPoint::attach(IPluginCommand* command) throw(){
     /* Only attach if not already attached */
-    if( _findPluginCommand(name) == _attachedPluginCommands.end() ){
-	_attachedPluginCommands.push_back(name);
+    if( _findPluginCommand(command->getName()) == _attachedPluginCommands.end() ){
+	_attachedPluginCommands[command->getName()] = command;
     }
 }
 
 /* Removes a plug-in command from the list */
-bool SentryHookPoint::removePluginCommand(string name) throw(){
-    vector<string>::iterator it = _findPluginCommand(name);
+bool SentryHookPoint::detach(IPluginCommand* command) throw(){
+    vector<string>::iterator it = _findPluginCommand(command->getName());
     
     if(it != _attachedPluginCommands.end() ){
 	_attachedPluginCommands.erase(it);

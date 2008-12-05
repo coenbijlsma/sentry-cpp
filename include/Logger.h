@@ -33,7 +33,7 @@ using std::string;
 class Logger {
 public:
 
-    static enum log_level_t {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_FATAL};
+    enum log_level_t {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_FATAL};
     static void log(string message, log_level_t log_level);
 
 };
