@@ -26,7 +26,7 @@ Sentry::Sentry(){
     /* Load the hookpoints that Sentry itself provides */
     _setupHookpoints();
     
-    string plugindir("./plugs/");
+    string plugindir(_config->getValue("application", "plugindir"));
     vector<string> files = _getPluginLibNames(plugindir); // XXX replace by configged value
     
     /**

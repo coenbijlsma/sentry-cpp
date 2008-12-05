@@ -1,17 +1,19 @@
 #include "PluginLoader.h"
+#include "Logger.h"
 #include <dlfcn.h>
 #include <iostream>
 
+/*
 using std::cerr;
 using std::cout;
 using std::endl;
+*/
 
 /* Retrieve the library from the given path */
 void* PluginLoader::_getLib(string libpath) throw (NoSuchLibraryException){
     void* lib = dlopen(libpath.c_str(), RTLD_LAZY);
     
     if( ! lib ){
-	cerr << dlerror() << endl;
 	throw NoSuchLibraryException();
     }
     
@@ -27,7 +29,6 @@ IPlugin* PluginLoader::loadPlugin(string libpath) throw (NoSuchLibraryException,
     const char* dlsym_error = dlerror();
     
     if(dlsym_error){
-	cerr << dlsym_error << endl;
 	dlclose(lib);
 	
 	// reset dlerror
@@ -35,7 +36,7 @@ IPlugin* PluginLoader::loadPlugin(string libpath) throw (NoSuchLibraryException,
 	
 	throw NoSuchSymbolException();
     }else{
-	cout << "Successfully loaded plugin " << libpath << endl;
+        Logger::log(string("Successfully loaded plugin " + libpath), Logger::LOG_INFO);
     }
 
     return (IPlugin*)create_plugin();
@@ -49,8 +50,6 @@ bool PluginLoader::unloadPlugin(IPlugin* plugin, string libpath) throw (NoSuchLi
     const char* dlsym_error = dlerror();
     
     if(dlsym_error){
-	cerr << dlsym_error << endl;
-	
 	// reset dlerror()
 	dlerror();
 	
@@ -63,8 +62,8 @@ bool PluginLoader::unloadPlugin(IPlugin* plugin, string libpath) throw (NoSuchLi
     }
     
     if(dlclose(lib) != 0){
-	cerr << "Could not unload plugin " << libpath << endl;
+        Logger::log(string("Could not unload plugin " + libpath), Logger::LOG_WARNING);
     }else{
-	cout << "Successfully unloaded plugin " << libpath << endl;
+        Logger::log(string("Successfully unloaded plugin " + libpath), Logger::LOG_INFO);
     }
 }

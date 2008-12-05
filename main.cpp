@@ -13,7 +13,7 @@ void show_warranty();
 int main(int argc, char** argv){
     /* Print GPL notices */
     if(argc == 1){
-	cout << "Sentry  Copyright (C) 2008  Coen Bijlsma" << endl;
+	cout << "Sentry Copyright (C) 2008  Coen Bijlsma" << endl;
 	cout << "This program comes with ABSOLUTELY NO WARRANTY; for details type `" << argv[0] << " -w'." << endl;
 	cout << "This is free software, and you are welcome to redistribute it" << endl;
 	cout << "under certain conditions; type `" << argv[0] << " -c' for details." << endl;

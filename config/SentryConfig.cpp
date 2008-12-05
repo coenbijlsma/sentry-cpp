@@ -49,7 +49,7 @@ void SentryConfig::_init() throw(string) {
     bool inSection = false;
 
     while(getline(_ifstream, line)){
-
+        
         // ignore empty lines and comment
         if( ! line.empty() && line.at(0) != '#'){
 
