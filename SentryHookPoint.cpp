@@ -13,9 +13,10 @@ SentryHookPoint::~SentryHookPoint(){
 
 /* Returns the iterator to the searched-for command */
 map<string, IPluginCommand*>::iterator SentryHookPoint::_findPluginCommand(string name){
-    for(vector<string>::iterator it = _attachedPluginCommands.begin(); it != _attachedPluginCommands.end(); it++){
-	
-	if( *it == name ){
+    for(map<string, IPluginCommand*>::iterator it = _attachedPluginCommands.begin(); it != _attachedPluginCommands.end(); it++){
+        IPluginCommand* cmd = it->second;
+
+	if( cmd->getName() == name ){
 	    return it;
 	}
     }
@@ -29,7 +30,7 @@ string SentryHookPoint::getName() throw(){
 }
 
 /* Gets the attached plug-in commands */
-vector<string> SentryHookPoint::getAttachedPluginCommands() throw(){
+map<string, IPluginCommand*> SentryHookPoint::getAttachedPluginCommands() throw(){
     return _attachedPluginCommands;
 }
 
@@ -53,7 +54,7 @@ void SentryHookPoint::attach(IPluginCommand* command) throw(){
 
 /* Removes a plug-in command from the list */
 bool SentryHookPoint::detach(IPluginCommand* command) throw(){
-    vector<string>::iterator it = _findPluginCommand(command->getName());
+    map<string, IPluginCommand*>::iterator it = _findPluginCommand(command->getName());
     
     if(it != _attachedPluginCommands.end() ){
 	_attachedPluginCommands.erase(it);

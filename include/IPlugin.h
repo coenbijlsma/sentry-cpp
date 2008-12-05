@@ -22,6 +22,9 @@
 #include "IHookPoint.h"
 #include "IPluginCommand.h"
 
+class IHookPoint;
+class IPluginCommand;
+
 using std::string;
 using std::vector;
 
@@ -42,6 +45,8 @@ using std::vector;
 class IPlugin {
 public:
 
+    virtual ~IPlugin(){}
+    
     /**
      * @brief Returns the name of this plug-in.
      */

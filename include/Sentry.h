@@ -20,6 +20,7 @@
 #include "IHookPoint.h"
 #include "IPlugin.h"
 #include "Logger.h"
+#include "SentryConfig.h"
 #include <map>
 #include <string>
 #include <vector>
@@ -66,6 +67,9 @@ private:
     /* contains all loaded plug-ins */
     map<string, IPlugin*> _plugins;
 
+    /* contains the config for Sentry */
+    SentryConfig* _config;
+
     /*
      * Returns the names of the plug-ins in the given directory.
      */
@@ -84,7 +88,7 @@ private:
     /*
      * Executes the commands contained in the given hookpoint.
      */
-    void _executeCommandsIn(const IHookPoint* hp);
+    void _executeCommandsIn(IHookPoint* hp);
     
 public:
 

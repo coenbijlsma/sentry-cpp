@@ -43,6 +43,9 @@ using std::map;
  */
 class IHookPoint {
 public:
+
+    virtual ~IHookPoint(){};
+    
     /**
      * Returns the hookpoint's name. To avoid ambiguous names, hookpoint names
      * must be in the form <plugin_name>.<hookpoint_name>

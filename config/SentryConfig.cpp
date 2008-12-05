@@ -81,7 +81,7 @@ void SentryConfig::_init() throw(string) {
 
                     // save the section and leave if end marker is found
                     if(line.at(0) == '}'){
-                        sections[section->getName()] = section;
+                        _sections[section->getName()] = section;
                         inSection = false;
                     }
                 } // line.at(0) != '{' && line.at(0) != '}'
@@ -103,7 +103,7 @@ void SentryConfig::_writeSection(ofstream* fs, SentryConfigSection* section) thr
         throw error;
     }
     if(section == 0){
-        string error("Non existant config section: " + name);
+        string error("Non existant config section: " + section->getName());
         throw error;
     }
 
@@ -111,7 +111,7 @@ void SentryConfig::_writeSection(ofstream* fs, SentryConfigSection* section) thr
     map<string, string>::iterator it;
 
     (*fs) << endl;
-    (*fs) << name << endl;
+    (*fs) << section->getName() << endl;
     (*fs) << "{" << endl;
 
     for(it = entries.begin(); it != entries.end(); it++){

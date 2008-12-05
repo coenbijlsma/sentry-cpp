@@ -38,6 +38,8 @@ class IPlugin;
  */
 class IPluginCommand {
 public:
+
+    virtual ~IPluginCommand(){};
     
     /**
      * @brief Returns the IPlugin* this IPluginCommand* belongs to.

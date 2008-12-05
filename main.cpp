@@ -1,4 +1,4 @@
-//#include "Sentry.h"
+#include "Sentry.h"
 #include <iostream>
 #include <string>
 
@@ -30,8 +30,8 @@ int main(int argc, char** argv){
 	return 0;
     }
     
-//    Sentry* sentry = new Sentry();
-//    delete sentry;
+    Sentry* sentry = new Sentry();
+    delete sentry;
 }
 
 void show_conditions(){

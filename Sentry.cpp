@@ -3,6 +3,7 @@
 #include "SentryHookPoint.h"
 #include <iostream>
 #include <vector>
+#include <cstdlib> /* For exit(int) */
 #include <dirent.h> /* For reading the plug-in directory */
 #include <string.h> /* For strcmp */
 //#include <libconfig.h++> /* for libconfig */
@@ -14,6 +15,14 @@ using std::vector;
 
 /* Construcor */
 Sentry::Sentry(){
+    /* Load the config */
+    try{
+        _config = new SentryConfig("./sentry.conf");
+    }catch(string error){
+        Logger::log(error, Logger::LOG_FATAL);
+        exit(1);
+    }
+    
     /* Load the hookpoints that Sentry itself provides */
     _setupHookpoints();
     
@@ -67,11 +76,29 @@ Sentry::Sentry(){
 /* Destructor */
 Sentry::~Sentry(){
 
+    /* Execute the pre-shutdown actions */
+    IHookPoint* pre_shutdown = _findHookPoint("core.pre_shutdown");
+    if( ! pre_shutdown ){
+        Logger::log("Could not find hookpoint core.pre_shutdown", Logger::LOG_ERROR);
+    }else{
+        _executeCommandsIn(pre_shutdown);
+        delete pre_shutdown;
+    }
+
     /* Unload the plug-ins */
     for(map<string, IPlugin*>::iterator it = _plugins.begin(); it != _plugins.end(); it++){
 	IPlugin* plugin = it->second;
+        Logger::log("Unloading " + plugin->getName(), Logger::LOG_INFO);
 	delete plugin;
     }
+
+    delete _config;
+        
+    IHookPoint* post_startup = _findHookPoint("core.post_startup");
+    if(post_startup != 0){
+        delete post_startup;
+    }
+
 }
 
 /* Finds a hookpoint by name */
@@ -95,35 +122,36 @@ vector<string> Sentry::_getPluginLibNames(string directory){
     
     if(numfiles >= 0){
 	for(int i = 0; i < numfiles; i++){
-	    if( strcmp(files[i]->d_name, ".") != 0 && strcmp(files[i]->d_name, "..") != 0 ){
+            if( strcmp(files[i]->d_name, ".") != 0 && strcmp(files[i]->d_name, "..") != 0 ){
 		string filename(directory + files[i]->d_name);
 		ret.push_back(filename);
 	    }
+            free(files[i]);
 	}
     }else{
         Logger::log("Could not open directory " + directory, Logger::LOG_ERROR);
     }
-	 
+
+    free(files);
     return ret;
 }
 
 /* Sets up the hookpoints for the Sentry core */
 void Sentry::_setupHookpoints(){
-    // XXX figure out if map.clear() also calls destructors of contained objects
     SentryHookPoint* postStartup = new SentryHookPoint(string("core.post_startup"));
     SentryHookPoint* preShutdown = new SentryHookPoint(string("core.pre_shutdown"));
         
     _hookpoints[postStartup->getName()] = postStartup;
-    _hookpoints[preSHutdown->getName()] = preShutdown;
+    _hookpoints[preShutdown->getName()] = preShutdown;
 }
 
 /* Executes the commands in the given hookpoint */
-void Sentry::_executeCommandsIn(const IHookPoint* hp){
+void Sentry::_executeCommandsIn(IHookPoint* hp){
     map<string, IPluginCommand*> commands = hp->getAttachedPluginCommands();
     map<string, IPluginCommand*>::iterator it = commands.begin();
     vector<string> not_used;
 
-    for(; it != hp->getAttachedPluginCommands().begin(); it++){
+    for(; it != commands.end(); it++){
         IPluginCommand* command = it->second;
         if(command != 0){
             command->execute(not_used);
