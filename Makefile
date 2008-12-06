@@ -7,4 +7,9 @@ testplugin:
 		g++ -I./include/ -fPIC -g -c -Wall ./plugs/TestPlugin.cpp
 		g++ -shared -Wl,-soname,libtestplugin.so.1 -o libtestplugin.so.1.0.0 TestPlugin.o -lc
 
-.PHONY: all testplugin
+clean:
+		@if [ -f ./TestPlugin.o ]; then rm ./TestPlugin.o; fi
+		@if [ -f ./sentry ]; then rm ./sentry; fi
+		@if [ -f libtestplugin.so.1.0.0 ]; then rm libtestplugin.so.1.0.0; fi
+
+.PHONY: all testplugin clean
