@@ -27,10 +27,12 @@ using std::map;
 
 /**
  * @brief HookPoint implementation for Sentry.
- * @author Coen Bijlsma
+ * @author $Author$
  * @copyright Copyright (C) 2008 by Coen Bijlsma
  * @since 2008-11-20
- * @version 0.1
+ * @changed $Date$
+ * @version $Id$
+ * @url $HeadURL$
  * @see Sentry.h
  *
  * This class is an implementation of the IHookPoint interface.

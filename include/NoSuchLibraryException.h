@@ -22,11 +22,13 @@
 using std::exception;
 
 /**
- * @author Coen Bijlsma
- * @copyright Copyright (C) 2008 by Coen Bijlsma
- * @version 0.1
- * @since 2008-11-20
  * @brief Exception class in case a library doesn't exist.
+ * @author $Author$
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
+ * @since 2008-11-20
+ * @changed $Date$
+ * @version $Id$
+ * @url $HeadURL$
  */
 class NoSuchLibraryException : public exception {
 public:

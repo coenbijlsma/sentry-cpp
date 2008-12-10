@@ -29,11 +29,13 @@ using std::string;
 using std::vector;
 
 /**
- * @author Coen Bijlsma
- * @copyright Copyright (C) 2008 by Coen Bijlsma 
- * @since 2008-11-20
- * @version 0.1
  * @brief Interface for plug-ins.
+ * @author $Author$
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
+ * @since 2008-11-20
+ * @changed $Date$
+ * @version $Id$
+ * @url $HeadURL$
  *
  * Sentry uses this interface to work with plug-ins.
  * If you want to create your own plug-ins, you have
@@ -45,6 +47,9 @@ using std::vector;
 class IPlugin {
 public:
 
+    /**
+     * Destructor
+     */
     virtual ~IPlugin(){}
     
     /**
@@ -59,9 +64,8 @@ public:
     
     /**
      * Returns the names of other plug-ins this plug-in depends on.
-     * Two plug-ins may have a reference to each other, and because of that
-     * all plug-ins are first loaded into the sentry core, and checked 
-     * afterwards.
+     * Two plug-ins may not have a reference to each other, thus preventing
+     * circular references.
      * If a plug-in is missing that is required by other plug-ins, those
      * plug-ins are removed as well, and therefore cannot be used.
      */

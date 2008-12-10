@@ -27,11 +27,13 @@ using std::string;
 using std::map;
 
 /**
- * @author Coen Bijlsma
+ * @brief Loads plug-ins into Sentry.
+ * @author $Author$
  * @copyright Copyright (C) 2008 by Coen Bijlsma
  * @since 2008-11-20
- * @version 0.1
- * @brief Loads plug-ins into Sentry
+ * @changed $Date$
+ * @version $Id$
+ * @url $HeadURL$.
  * @see IPlugin.h
  *
  * This class is used by Sentry to load plug-ins from the given path, which

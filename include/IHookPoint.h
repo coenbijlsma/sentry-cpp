@@ -26,10 +26,12 @@ using std::map;
 
 /**
  * @brief Interface for hookpoints.
- * @author Coen Bijlsma
+ * @author $Author$
  * @copyright Copyright (C) 2008 by Coen Bijlsma
  * @since 2008-11-20
- * @version 0.1
+ * @changed $Date$
+ * @version $Id$
+ * @url $HeadURL$
  *
  * This class is an interface for hookpoints in Sentry and plug-ins.
  * A hookpoint is actually a 'hook' that your code can grab onto, and
@@ -44,6 +46,9 @@ using std::map;
 class IHookPoint {
 public:
 
+    /**
+     * Destructor
+     */
     virtual ~IHookPoint(){};
     
     /**

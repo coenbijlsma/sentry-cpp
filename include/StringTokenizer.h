@@ -24,6 +24,15 @@
 
 using std::string;
 
+/**
+ * @brief Class for splitting strings into tokens
+ * @author $Author$
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
+ * @since 2008-11-20
+ * @changed $Date$
+ * @version $Id$
+ * @url $HeadURL$
+ */
 class StringTokenizer {
 private:
         char* _sequence;

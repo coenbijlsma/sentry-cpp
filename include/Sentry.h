@@ -30,11 +30,13 @@ using std::vector;
 using std::string;
 
 /**
- * @brief The core class of Sentry
- * @author Coen Bijlsma
- * @copyright Copyright (c) 2008 by Coen Bijlsma
+ * @brief The core class of Sentry.
+ * @author $Author$
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
  * @since 2008-11-20
- * @version 0.1
+ * @changed $Date$
+ * @version $Id$
+ * @url $HeadURL$
  * @see IPlugin.h
  * @see IHookPoint.h
  *

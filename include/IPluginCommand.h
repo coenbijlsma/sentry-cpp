@@ -18,19 +18,25 @@
 #define IPLUGINCOMMAND_H
 
 #include "IPlugin.h"
+#include "IHookPoint.h"
+#include <map>
 #include <string>
 #include <vector>
 
+using std::map;
 using std::string;
 using std::vector;
 
 class IPlugin;
 
 /**
- * @author Coen Bijlsma
- * @copyright Copyright (C) 2008 by Coen Bijlsma 
+ * @brief Interface for plug-in commands.
+ * @author $Author$
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
  * @since 2008-11-20
- * @version 0.1
+ * @changed $Date$
+ * @version $Id$
+ * @url $HeadURL$
  *
  * This interface is used by Sentry to work with plug-in commands.
  * If you want to write your own plug-ins, you have to implement this
@@ -39,6 +45,9 @@ class IPlugin;
 class IPluginCommand {
 public:
 
+    /**
+     * Destructor
+     */
     virtual ~IPluginCommand(){};
     
     /**
@@ -54,12 +63,16 @@ public:
     virtual string getName() =0;
     
     /**
-     * @brief The name of the hookpoint this command is attached to.
+     * @brief The hookpoints this command is attached to.
      */
-    virtual string getHookPoint() =0;
+    virtual map<string, IHookPoint*> getHookPoints() =0;
     
     /**
      * @brief Executes the command with the given parameters.
+     * This method executes the command with the given parameters.
+     * To be clear about what parameters are expected for each command,
+     * I recommend putting the requirements in the header file(s) of
+     * your own commands.
      */
     virtual void execute(vector<string> params) =0;
 };
