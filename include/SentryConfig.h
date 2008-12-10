@@ -35,6 +35,8 @@ using std::ofstream;
  * @changed $Date$
  * @version $Id$
  * @url $HeadURL$
+ *
+ * This class handles config files for sentry.
  */
 class SentryConfig {
 private:
