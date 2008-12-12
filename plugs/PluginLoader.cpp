@@ -14,7 +14,9 @@ void* PluginLoader::_getLib(string libpath) throw (NoSuchLibraryException){
     void* lib = dlopen(libpath.c_str(), RTLD_LAZY);
     
     if( ! lib ){
-	throw NoSuchLibraryException();
+        NoSuchLibraryException ex;
+        ex.setWhat(string("Could not load library " + libpath).c_str() ) ;
+	throw ex;
     }
     
     return lib;
@@ -29,12 +31,13 @@ IPlugin* PluginLoader::loadPlugin(string libpath) throw (NoSuchLibraryException,
     const char* dlsym_error = dlerror();
     
     if(dlsym_error){
-	dlclose(lib);
-	
-	// reset dlerror
+        Logger::log(dlsym_error, Logger::LOG_INFO);
+        NoSuchSymbolException ex;
+        ex.setWhat(string(dlsym_error).c_str() );
+        dlclose(lib);
+        // reset dlerror
 	dlerror();
-	
-	throw NoSuchSymbolException();
+	throw ex;
     }else{
         Logger::log(string("Successfully loaded plugin " + libpath), Logger::LOG_INFO);
     }

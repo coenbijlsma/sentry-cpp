@@ -18,8 +18,10 @@
 #define NOSUCHSYMBOLEXCEPTION_H
 
 #include <exception>
+#include <string>
 
 using std::exception;
+using std::string;
 
 /**
  * @brief Exception class in case a symbol is not found.
@@ -31,9 +33,13 @@ using std::exception;
  * @url $HeadURL$
  */
 class NoSuchSymbolException : public exception {
+private:
+    const char* _what;
+    
 public:
     
     virtual const char* what() const throw();
+    void setWhat(string what) throw();
 };
 
 #endif
