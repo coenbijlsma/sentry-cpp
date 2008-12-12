@@ -1,21 +1,38 @@
-#include <map>
+/**
+ * This file is part of Sentry.
+ *
+ * Sentry is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * Sentry is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with Sentry.  If not, see <http://www.gnu.org/licenses/>.
+ */
 
 #include "SentryConfig.h"
 #include "StringTokenizer.h"
 #include "Logger.h"
+#include <vector>
 
 using std::endl;
-using std::ios;
+using std::ios_base;
 using std::ifstream;
+using std::vector;
 
 SentryConfig::SentryConfig(string filename) throw(string){
     _filename = filename;
 
-    ifstream _ifstream(_filename.c_str(), ios::in);
+    ifstream _ifstream(_filename.c_str(), ios_base::in);
 
     if( ! _ifstream.is_open()){
         Logger::log("Config not found!", Logger::LOG_FATAL);
-        throw string("Config file not found (was looking for sentry.conf)");
+        throw string("Config file not found (was looking for " + filename + ")");
     }
 
     _ifstream.close();
@@ -35,7 +52,7 @@ SentryConfig::~SentryConfig() throw(){
 }
 
 void SentryConfig::_init() throw(string) {
-    ifstream _ifstream(_filename.c_str(), ios::in);
+    ifstream _ifstream(_filename.c_str(), ios_base::in);
     
     if( ! _ifstream.is_open()){
         _ifstream.close();
@@ -47,6 +64,7 @@ void SentryConfig::_init() throw(string) {
     string line;
     SentryConfigSection* section = 0;
     bool inSection = false;
+    vector<string> tempComment;
 
     while(getline(_ifstream, line)){
         
@@ -57,6 +75,12 @@ void SentryConfig::_init() throw(string) {
             if( ! inSection ){
                 section = new SentryConfigSection(line);
                 inSection = true;
+
+                // add the comments to the section, if any
+                if(tempComment.size() > 0){
+                    section->addAllComment(tempComment);
+                    tempComment.clear();
+                }
             }else{
                 if( line.at(0) != '{' && line.at(0) != '}'){
                     StringTokenizer st(line, ' ');
@@ -88,6 +112,12 @@ void SentryConfig::_init() throw(string) {
 
             } // inSection
 
+        }else{
+            // add the comment to the vector if it's comment
+            if(!line.empty() && line.at(0) == '#'){
+                tempComment.push_back(line);
+            }
+
         } // !line.empty() && line.at(0) != '#'
 
     } // while(getline())
@@ -109,8 +139,14 @@ void SentryConfig::_writeSection(ofstream* fs, SentryConfigSection* section) thr
 
     map<string, string> entries = section->all();
     map<string, string>::iterator it;
+    vector<string> comment = section->getComment();
+    vector<string>::iterator ci;
 
     (*fs) << endl;
+    for(ci = comment.begin(); ci != comment.end(); ci++){
+        (*fs) << *ci << endl;
+    }
+
     (*fs) << section->getName() << endl;
     (*fs) << "{" << endl;
 
@@ -154,17 +190,16 @@ void SentryConfig::setSetting(string section, string setting, string value) thro
 }
 
 bool SentryConfig::writeConfig() throw() {
-    ofstream _ofstream(_filename.c_str(), ios::in);
+    ofstream _ofstream(_filename.c_str());
 
     if(_ofstream.is_open()){
-
         // file exists, so empty it before writing
-        _ofstream.open(_filename.c_str(), ios::in | ios::out | ios::app | ios::trunc);
-    }else{
-
-        // file doesn't exist, so also create it here
-        _ofstream.open(_filename.c_str(), ios::in | ios::out | ios::app);
+        _ofstream.open(_filename.c_str(), ios_base::app | ios_base::trunc);
+        _ofstream.flush();
+        _ofstream.close();
     }
+
+    _ofstream.open(_filename.c_str(), ios_base::app);
 
     map<string, SentryConfigSection*>::iterator it;
 
@@ -177,6 +212,7 @@ bool SentryConfig::writeConfig() throw() {
         }
     }
 
+    _ofstream.flush();
     _ofstream.close();
     return true;
 }

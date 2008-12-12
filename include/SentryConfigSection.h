@@ -19,9 +19,11 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 using std::string;
 using std::map;
+using std::vector;
 
 /**
  * @brief Class for handling config sections.
@@ -35,6 +37,7 @@ using std::map;
 class SentryConfigSection {
 private:
         string _name;
+        vector<string> _comment;
         map<string, string> _entries;
 
 public:
@@ -53,6 +56,21 @@ public:
          * Returns the name of this SentryConfigSection
          */
         string getName();
+
+        /**
+         * Returns the comment for this section
+         */
+        vector<string> getComment();
+
+        /**
+         * Adds the given string to the comment of this section.
+         */
+        void addComment(string comment);
+
+        /**
+         * Adds the contents of the given vector to the comment of this section.
+         */
+        void addAllComment(vector<string> comment);
 
         /*
          * Returns the value of the requested setting.
