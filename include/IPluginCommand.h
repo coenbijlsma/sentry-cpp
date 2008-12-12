@@ -28,6 +28,7 @@ using std::string;
 using std::vector;
 
 class IPlugin;
+class IHookPoint;
 
 /**
  * @brief Interface for plug-in commands.
