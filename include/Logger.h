@@ -32,7 +32,7 @@ using std::string;
  *
  * This class logs messages throughout Sentry. If you want, you can use this
  * class in your own plug-ins to achieve a more generic way of logging for
- * the whole thing.
+ * the whole thing. test
  */
 class Logger {
 public:
