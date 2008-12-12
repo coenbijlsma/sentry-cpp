@@ -93,12 +93,20 @@ private:
     void _executeCommandsIn(IHookPoint* hp);
     
 public:
+    enum exit_code_t {EXIT_NO_CONFIG = 1, EXIT_NO_PLUGIN_DIR};
 
-    /* Constructor */
+    /*
+     * Constructor
+     * Locates the libraries and loads them. Sentry exits if the config file
+     * cannot be found, or if the plug-in directory doesn't exist with the
+     * following exit codes:
+     * - Config file not found: EXIT_NO_CONFIG
+     * - Plug-in directory not found: EXIT_NO_PLUGIN_DIR
+     */
     Sentry();
     
     /* Destructor */
-    ~Sentry();
+    ~Sentry() throw();
     
 };
 

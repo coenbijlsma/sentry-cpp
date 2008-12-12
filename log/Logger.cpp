@@ -17,22 +17,60 @@
 
 #include "Logger.h"
 #include <iostream>
+#include <fstream>
 
 using std::cerr;
 using std::cout;
 using std::endl;
+using std::ofstream;
+using std::ios_base;
 
-void Logger::log(string message, log_level_t log_level){
+Logger::log_destination_t Logger::log_destination;
+string Logger::logfile;
+
+void Logger::log(string message, log_level_t log_level) throw(){
     switch(log_level){
         case LOG_INFO:
-            cout << "[INFO] " << message << endl; break;
+            message = string("[INFO] " + message); break;
         case LOG_WARNING:
-            cout << "[WARNING] " << message << endl; break;
+            message = string("[WARNING] " + message); break;
         case LOG_ERROR:
-            cerr << "[ERROR] " << message << endl; break;
+            message = string("[ERROR] " + message); break;
         case LOG_FATAL:
-            cerr << "[FATAL] " << message << endl; break;
+            message = string("[FATAL] " + message); break;
         default:
-            cerr << "[UNKNOWN] " << message << endl; break;
+            message = string("[UNKNOWN] " + message); break;
     }
+
+    if(Logger::log_destination == Logger::DEST_STDOUT){
+        switch(log_level){
+            case LOG_INFO:
+            case LOG_WARNING:
+                cout << message << endl; break;
+            case LOG_ERROR:
+            case LOG_FATAL:
+            default:
+                cout << message << endl; break;
+
+        }
+    }else if(Logger::log_destination == Logger::DEST_FILE){
+        ofstream os(Logger::logfile.c_str(), ios_base::out | ios_base::app);
+        
+        os << message << '\n';
+        os.flush();
+        os.close();
+    }else if(Logger::log_destination == Logger::DEST_DATABASE){
+        cout << "[INFO] Redirecting logger to stdout" << endl;
+        Logger::setDestination(Logger::DEST_STDOUT);
+        Logger::log(message, log_level);
+    }
+    
+}
+
+void Logger::setDestination(log_destination_t dest) throw(){
+    Logger::log_destination = dest;
+}
+
+void Logger::setlogFile(string filepath) throw(){
+    Logger::logfile = filepath;
 }

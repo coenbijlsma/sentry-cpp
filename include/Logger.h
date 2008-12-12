@@ -43,11 +43,38 @@ public:
     enum log_level_t {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_FATAL};
 
     /**
+     * The available log destinations
+     */
+    enum log_destination_t {DEST_STDOUT, DEST_FILE, DEST_DATABASE};
+    
+    /**
      * Logs the given message. Currently this is printed to the standard
      * outputstreams, but I plan to change that and use log4cpp for that.
      */
-    static void log(string message, log_level_t log_level);
+    static void log(string message, log_level_t log_level) throw();
 
+    /**
+     * Sets the destination of the logfile. I already put DEST_DATABASE in
+     * the options, but that's not supported yet. If no log_destination is
+     * set, DEST_STDOUT is used.
+     */
+    static void setDestination(log_destination_t dest) throw();
+
+    /**
+     * Sets the full path to the logfile
+     */
+    static void setlogFile(string filepath) throw();
+
+private:
+    /**
+     * The destination of the logges messages
+     */
+    static log_destination_t log_destination;
+
+    /**
+     * The logfile in case the logging is done to a file
+     */
+    static string logfile;
 };
 
 #endif

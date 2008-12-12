@@ -17,8 +17,10 @@
 
 #include "Sentry.h"
 #include "PluginLoader.h"
+#include "Logger.h"
 #include "SentryHookPoint.h"
 #include <iostream>
+#include <ctime>
 #include <vector>
 #include <cstdlib> /* For exit(int) */
 #include <dirent.h> /* For reading the plug-in directory */
@@ -34,16 +36,31 @@ Sentry::Sentry(){
     /* Load the config */
     try{
         _config = new SentryConfig("./sentry.conf");
+        Logger::setDestination(Logger::DEST_STDOUT);
+        
+        // and setup logging
+        string logdestination = _config->getValue("log", "destination");
+        if(logdestination == "file"){
+            Logger::setDestination(Logger::DEST_FILE);
+            Logger::setlogFile(_config->getValue("log", "filename"));
+        }else if(logdestination == "database"){
+            Logger::setDestination(Logger::DEST_DATABASE);
+        }
     }catch(string error){
         Logger::log(error, Logger::LOG_FATAL);
-        exit(1);
+        exit(Sentry::EXIT_NO_CONFIG);
     }
     
     /* Load the hookpoints that Sentry itself provides */
     _setupHookpoints();
     
     string plugindir(_config->getValue("application", "plugindir") + "/");
-    vector<string> files = _getPluginLibNames(plugindir); // XXX replace by configged value
+    if(plugindir == ""){
+        Logger::log("Plugin directory not in config.", Logger::LOG_FATAL);
+        exit(Sentry::EXIT_NO_PLUGIN_DIR);
+    }
+    
+    vector<string> files = _getPluginLibNames(plugindir);
     
     /**
      * Load the plug-ins 
@@ -90,7 +107,7 @@ Sentry::Sentry(){
 }
 
 /* Destructor */
-Sentry::~Sentry(){
+Sentry::~Sentry() throw(){
 
     /* Execute the pre-shutdown actions */
     IHookPoint* pre_shutdown = _findHookPoint("core.pre_shutdown");
