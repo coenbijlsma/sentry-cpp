@@ -32,6 +32,8 @@ using std::string;
  * @changed $Date$
  * @version $Id$
  * @url $HeadURL$
+ *
+ * This class takes a string and chops it up into pieces.
  */
 class StringTokenizer {
 private:
