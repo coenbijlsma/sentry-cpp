@@ -24,22 +24,20 @@ using std::cout;
 using std::cerr;
 using std::endl;
 
+void show_copyright(char*);
 void show_conditions();
 void show_warranty();
 
 int main(int argc, char** argv){
     /* Print GPL notices */
-    if(argc == 1){
-	cout << "Sentry Copyright (C) 2008  Coen Bijlsma" << endl;
-	cout << "This program comes with ABSOLUTELY NO WARRANTY; for details type `" << argv[0] << " -w'." << endl;
-	cout << "This is free software, and you are welcome to redistribute it" << endl;
-	cout << "under certain conditions; type `" << argv[0] << " -c' for details." << endl;
-    }else{
+    if(argc > 1){
 	string arg2(argv[1]);
 	if(arg2 == "-w"){
 	    show_warranty();
 	}else if(arg2 == "-c"){
 	    show_conditions();
+	}else if(arg2 == "--version"){
+	    show_copyright(argv[0]);
 	}else{
 	    cerr << "Unknown commandline option " << arg2 << endl;
 	}
@@ -86,3 +84,11 @@ void show_warranty(){
     cout << "of liability accompanies a copy of the Program in return for a fee." << endl;
 }
 
+void show_copyright(char* argv0){
+    cout << "Sentry Copyright (C) 2008  Coen Bijlsma" << endl;
+    cout << "This program comes with ABSOLUTELY NO WARRANTY; for details type `" << argv0 << " -w'." << endl;
+    cout << "This is free software, and you are welcome to redistribute it" << endl;
+    cout << "under certain conditions; type `" << argv0 << " -c' for details." << endl;
+    cout << endl;
+    cout << "Written by Coen Bijlsma" << endl;
+}
