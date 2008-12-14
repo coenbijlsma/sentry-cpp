@@ -21,6 +21,7 @@
 #include "IPlugin.h"
 #include "Logger.h"
 #include "SentryConfig.h"
+#include "IPluginProvider.h"
 #include <map>
 #include <string>
 #include <vector>
@@ -57,7 +58,11 @@ using std::string;
  * more information about this, see IPlugin.h
  *
  */
-class Sentry {
+
+class Sentry : public IPluginProvider {
+public:
+    enum context_t {CONTEXT_LIVE, CONTEXT_DEBUG};
+    
 private:
 
     /* contains mappings between plugin names and theirs paths*/
@@ -72,15 +77,12 @@ private:
     /* contains the config for Sentry */
     SentryConfig* _config;
 
+    context_t _context;
+
     /*
      * Returns the names of the plug-ins in the given directory.
      */
     vector<string> _getPluginLibNames(string directory);
-
-    /*
-     * Finds the hookpoint that has the given name
-     */
-    IHookPoint* _findHookPoint(string name);
 
     /*
      * Sets up the hookpoints that Sentry provides
@@ -107,7 +109,23 @@ public:
     
     /* Destructor */
     ~Sentry() throw();
-    
+
+    void setContext(context_t context);
+
+    /**
+     * Loads the plugins
+     */
+    void loadPlugins();
+
+    /*
+     * Finds the hookpoint that has the given name
+     */
+    IHookPoint* findHookPoint(string name);
+
+    /**
+     * Finds the plugin that has the given name
+     */
+    IPlugin* findPlugin(string name);
 };
 
 #endif

@@ -10,47 +10,48 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with Sentry.  If not, see <http://www.gnu.org/licenses/>.
  */
+
+#ifndef IRCBASE_H
+#define	IRCBASE_H
+
+#include <string>
+#include <vector>
 #include "IPlugin.h"
-#include "IPluginProvider.h"
 #include "IHookPoint.h"
 #include "IPluginCommand.h"
-
-#include <vector>
-#include <string>
 
 using std::string;
 using std::vector;
 
-class TestPlugin : public IPlugin {
+/**
+ * @brief The IRC base plug-in
+ * @author $Author $
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
+ * @since 2008-11-20
+ * @changed $Date$
+ * @version $Id$
+ * @url $HeadURL$
+ */
+class IRCBase : public IPlugin {
 private:
-    string _name;
-    IPluginProvider* _provider;
-    vector<IHookPoint*> _hookpoints;
-    vector<string> _dependencies;
-    vector<IPluginCommand*> _commands;
-        
 public:
 
-    TestPlugin(string name);
-    virtual ~TestPlugin();
+    IRCBase();
+    virtual ~IRCBase();
 
-    void setProvider(IPluginProvider* provider);
-    
     string getName();
-    
+
     vector<IHookPoint*> getProvidingHookPoints();
-    
+
     vector<string> getDependencies();
-    
+
     vector<IPluginCommand*> getCommands();
 
     IPluginCommand* findCommand(string name);
-    
 };
 
-//typedef IPlugin* create_plugin_t();
-//typedef bool destroy_plugin_t(IPlugin* plugin);
+#endif	/* IRCBASE_H */

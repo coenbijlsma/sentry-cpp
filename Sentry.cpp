@@ -54,49 +54,8 @@ Sentry::Sentry(){
     /* Load the hookpoints that Sentry itself provides */
     _setupHookpoints();
     
-    string plugindir(_config->getValue("application", "plugindir") + "/");
-    if(plugindir == ""){
-        Logger::log("Plugin directory not in config.", Logger::LOG_FATAL);
-        exit(Sentry::EXIT_NO_PLUGIN_DIR);
-    }
-    
-    vector<string> files = _getPluginLibNames(plugindir);
-    
-    /**
-     * Load the plug-ins 
-     */
-    for(int i = 0; i < files.size(); i++){
-	try{
-	    string pluginfile = files.at(i);
-	    IPlugin* plugin = PluginLoader::loadPlugin(pluginfile);
-	    
-	    if(plugin != 0){
-		_plugins[plugin->getName()] = plugin;
-		_pluginpathmap[plugin->getName()] = pluginfile;
-		vector<IHookPoint*> hookpoints = plugin->getProvidingHookPoints();
-		
-		for(int h = 0; h < hookpoints.size(); h++){
-		    IHookPoint* hookpoint = hookpoints.at(h);
-		    
-		    if( _findHookPoint(hookpoint->getName()) == 0 ){
-			_hookpoints[hookpoint->getName()] = hookpoint;
-		    }else{
-                        Logger::log("Ignoring already available hookpoint " + hookpoint->getName(), Logger::LOG_WARNING);
-		    }
-		}
-	    }
-	}
-	catch(NoSuchLibraryException& nsle){
-            Logger::log(nsle.what(), Logger::LOG_ERROR);
-	}
-	catch(NoSuchSymbolException& nsse){
-            Logger::log(nsse.what(), Logger::LOG_ERROR);
-	}
-	    
-    }
-    
     /* Execute the post-startup actions */
-    IHookPoint* post_startup = _findHookPoint("core.post_startup");
+    IHookPoint* post_startup = findHookPoint("core.post_startup");
     
     if( ! post_startup ){
         Logger::log("Could not find hookpoint core.post_startup", Logger::LOG_ERROR);
@@ -110,7 +69,7 @@ Sentry::Sentry(){
 Sentry::~Sentry() throw(){
 
     /* Execute the pre-shutdown actions */
-    IHookPoint* pre_shutdown = _findHookPoint("core.pre_shutdown");
+    IHookPoint* pre_shutdown = findHookPoint("core.pre_shutdown");
     if( ! pre_shutdown ){
         Logger::log("Could not find hookpoint core.pre_shutdown", Logger::LOG_ERROR);
     }else{
@@ -127,23 +86,65 @@ Sentry::~Sentry() throw(){
 
     delete _config;
         
-    IHookPoint* post_startup = _findHookPoint("core.post_startup");
+    IHookPoint* post_startup = findHookPoint("core.post_startup");
     if(post_startup != 0){
         delete post_startup;
     }
 
 }
 
-/* Finds a hookpoint by name */
-IHookPoint* Sentry::_findHookPoint(string name){
-    map<string, IHookPoint*>::iterator hookpoint = _hookpoints.find(name);
-    
-    if( hookpoint == _hookpoints.end() ){
-	// hookpoint doesn't exist
-	return (IHookPoint*)0;
+void Sentry::setContext(context_t context){
+    _context = context;
+}
+
+void Sentry::loadPlugins(){
+    string plugindir(_config->getValue("application", "plugindir") + "/");
+    if(plugindir == ""){
+        Logger::log("Plugin directory not in config.", Logger::LOG_FATAL);
+        exit(Sentry::EXIT_NO_PLUGIN_DIR);
     }
-    
-    return hookpoint->second;
+
+    vector<string> files = _getPluginLibNames(plugindir);
+
+    /**
+     * Load the plug-ins
+     */
+    for(int i = 0; i < files.size(); i++){
+	try{
+	    string pluginfile = files.at(i);
+	    IPlugin* plugin = PluginLoader::loadPlugin(pluginfile, this);
+
+	    if(plugin != 0){
+		_plugins[plugin->getName()] = plugin;
+		_pluginpathmap[plugin->getName()] = pluginfile;
+		vector<IHookPoint*> hookpoints = plugin->getProvidingHookPoints();
+
+		for(int h = 0; h < hookpoints.size(); h++){
+		    IHookPoint* hookpoint = hookpoints.at(h);
+
+		    if( findHookPoint(hookpoint->getName()) == 0 ){
+			_hookpoints[hookpoint->getName()] = hookpoint;
+		    }else{
+                        Logger::log("Ignoring already available hookpoint " + hookpoint->getName(), Logger::LOG_WARNING);
+		    }
+		}
+	    }
+	}
+	catch(NoSuchLibraryException& nsle){
+            Logger::log(nsle.what(), Logger::LOG_ERROR);
+	}
+	catch(NoSuchSymbolException& nsse){
+            Logger::log(nsse.what(), Logger::LOG_ERROR);
+	}
+
+        IHookPoint* post_load_plugins = findHookPoint("core.post_load_plugins");
+        if(post_load_plugins == 0){
+            Logger::log("Could not find hookpoint core.post_load_plugins", Logger::LOG_ERROR);
+        }else{
+            _executeCommandsIn(post_load_plugins);
+        }
+
+    }
 }
 
 /* Returns the names if the files in the plug-in directory */
@@ -173,9 +174,11 @@ vector<string> Sentry::_getPluginLibNames(string directory){
 void Sentry::_setupHookpoints(){
     SentryHookPoint* postStartup = new SentryHookPoint(string("core.post_startup"));
     SentryHookPoint* preShutdown = new SentryHookPoint(string("core.pre_shutdown"));
+    SentryHookPoint* postLoadPlugins = new SentryHookPoint(string("core.post_load_plugins"));
         
     _hookpoints[postStartup->getName()] = postStartup;
     _hookpoints[preShutdown->getName()] = preShutdown;
+    _hookpoints[postLoadPlugins->getName()] = postLoadPlugins;
 }
 
 /* Executes the commands in the given hookpoint */
@@ -190,4 +193,26 @@ void Sentry::_executeCommandsIn(IHookPoint* hp){
             command->execute(not_used);
         }
     }
+}
+
+/* Finds a hookpoint by name */
+IHookPoint* Sentry::findHookPoint(string name){
+    map<string, IHookPoint*>::iterator hookpoint = _hookpoints.find(name);
+
+    if( hookpoint == _hookpoints.end() ){
+	// hookpoint doesn't exist
+	return (IHookPoint*)0;
+    }
+
+    return hookpoint->second;
+}
+
+/* Finds a plug-in by name */
+IPlugin* Sentry::findPlugin(string name){
+    map<string, IPlugin*>::iterator plugin = _plugins.find(name);
+
+    if(plugin == _plugins.end() ){
+        return (IPlugin*)0;
+    }
+    return plugin->second;
 }

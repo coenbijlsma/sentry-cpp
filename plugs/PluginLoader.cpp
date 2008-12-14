@@ -23,7 +23,7 @@ void* PluginLoader::_getLib(string libpath) throw (NoSuchLibraryException){
 }
 
 /* Loads the plug-in from the given path */
-IPlugin* PluginLoader::loadPlugin(string libpath) throw (NoSuchLibraryException, NoSuchSymbolException){
+IPlugin* PluginLoader::loadPlugin(string libpath, IPluginProvider* provider) throw (NoSuchLibraryException, NoSuchSymbolException){
     void* lib = _getLib(libpath);
     
     /* Load the create symbol */
@@ -38,11 +38,20 @@ IPlugin* PluginLoader::loadPlugin(string libpath) throw (NoSuchLibraryException,
         // reset dlerror
 	dlerror();
 	throw ex;
-    }else{
-        Logger::log(string("Successfully loaded plugin " + libpath), Logger::LOG_INFO);
     }
 
-    return (IPlugin*)create_plugin();
+    IPlugin* plugin = (IPlugin*)create_plugin();    
+    if(plugin){
+        if(provider == 0){
+            Logger::log("PluginProvider is NULL, unloading plugin", Logger::LOG_ERROR);
+            delete plugin;
+            return (IPlugin*)0;
+        }else{
+            plugin->setProvider(provider);
+            Logger::log(string("Successfully loaded plugin " + libpath), Logger::LOG_INFO);
+        }
+    }
+    return plugin;
 }
 
 /* Destroys the given IPlugin, which has to reside in the library in the given path */

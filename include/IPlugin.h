@@ -21,6 +21,7 @@
 #include <vector>
 #include "IHookPoint.h"
 #include "IPluginCommand.h"
+#include "IPluginProvider.h"
 
 class IHookPoint;
 class IPluginCommand;
@@ -51,6 +52,11 @@ public:
      * Destructor
      */
     virtual ~IPlugin(){}
+
+    /**
+     * @brief Sets the provider for this plug-in
+     */
+    virtual void setProvider(IPluginProvider* provider) =0;
     
     /**
      * @brief Returns the name of this plug-in.
@@ -75,6 +81,11 @@ public:
      * Returns the commands this plug-in provides.
      */
     virtual vector<IPluginCommand*> getCommands() =0;
+
+    /**
+     * Returns the command that has the given name
+     */
+    virtual IPluginCommand* findCommand(string name) =0;
     
 };
 

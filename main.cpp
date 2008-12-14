@@ -27,25 +27,33 @@ using std::endl;
 void show_copyright(char*);
 void show_conditions();
 void show_warranty();
+void show_options();
 
 int main(int argc, char** argv){
     /* Print GPL notices */
+    Sentry* sentry = 0;
     if(argc > 1){
 	string arg2(argv[1]);
 	if(arg2 == "-w"){
-	    show_warranty();
+	    show_warranty(); return 0;
 	}else if(arg2 == "-c"){
-	    show_conditions();
-	}else if(arg2 == "--version"){
-	    show_copyright(argv[0]);
+	    show_conditions(); return 0;
+	}else if(arg2 == "--version" || arg2 == "-V"){
+	    show_copyright(argv[0]); return 0;
+        }else if(arg2 == "-d" || arg2 == "--debug"){
+            sentry = new Sentry();
+            sentry->setContext(Sentry::CONTEXT_DEBUG);
 	}else{
 	    cerr << "Unknown commandline option " << arg2 << endl;
+            show_options(); return 0;
 	}
-	/* And exit */
-	return 0;
+	
     }
-    
-    Sentry* sentry = new Sentry();
+
+    if(sentry == 0){
+        sentry = new Sentry();
+    }
+    sentry->loadPlugins();
     delete sentry;
 }
 
@@ -91,4 +99,12 @@ void show_copyright(char* argv0){
     cout << "under certain conditions; type `" << argv0 << " -c' for details." << endl;
     cout << endl;
     cout << "Written by Coen Bijlsma" << endl;
+}
+
+void show_options(){
+    cout << "Sentry supports the following commandline options:" << endl;
+    cout << "-w\t\tShows the warranty" << endl;
+    cout << "-c\t\tShows the copyright notice" << endl;
+    cout << "-V, --version\t\tShows the version of Sentry" << endl;
+    cout << "-d, --debug\t\tRuns Sentry in debug mode, hence more verbose output" << endl;
 }

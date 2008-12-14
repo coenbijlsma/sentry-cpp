@@ -18,6 +18,7 @@
 #define PLUGINLOADER_H
 
 #include "IPlugin.h"
+#include "IPluginProvider.h"
 #include "NoSuchLibraryException.h"
 #include "NoSuchSymbolException.h"
 #include <string>
@@ -67,7 +68,7 @@ public:
      * of how to program this, you can fetch the sources of Sentry and
      * check out some of the already provided plug-ins.
      */
-    static IPlugin* loadPlugin(string libpath) throw(NoSuchLibraryException, NoSuchSymbolException);
+    static IPlugin* loadPlugin(string libpath, IPluginProvider* provider) throw(NoSuchLibraryException, NoSuchSymbolException);
     
     /**
      * @brief Unloads the provided plug-in.

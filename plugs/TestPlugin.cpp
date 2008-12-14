@@ -44,6 +44,10 @@ TestPlugin::~TestPlugin(){
     _commands.clear();
 }
 
+void TestPlugin::setProvider(IPluginProvider* provider){
+    _provider = provider;
+}
+
 string TestPlugin::getName(){
     return _name;
 }
@@ -58,6 +62,16 @@ vector<string> TestPlugin::getDependencies(){
 
 vector<IPluginCommand*> TestPlugin::getCommands(){
     return _commands;
+}
+
+IPluginCommand* TestPlugin::findCommand(string name){
+    for(vector<IPluginCommand*>::iterator it = _commands.begin(); it != _commands.end(); it++){
+        IPluginCommand* cmd = *it;
+        if(cmd->getName() == name){
+            return cmd;
+        }
+    }
+    return (IPluginCommand*)0;
 }
 
 extern "C" IPlugin* create_plugin(){
