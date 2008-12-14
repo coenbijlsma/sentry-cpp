@@ -29,7 +29,7 @@ using std::vector;
 
 /**
  * @brief The IRC base plug-in
- * @author $Author $
+ * @author $Author$
  * @copyright Copyright (C) 2008 by Coen Bijlsma
  * @since 2008-12-14
  * @changed $Date$

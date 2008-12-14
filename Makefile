@@ -33,5 +33,6 @@ clean:
 		@if [ -f ./TestPlugin.o ]; then rm ./TestPlugin.o; fi
 		@if [ -f ./sentry ]; then rm ./sentry; fi
 		@if [ -f ./plugs/libtestplugin.so.1.0.0 ]; then rm ./plugs/libtestplugin.so.1.0.0; fi
+		@make clean -f ./plugs/ircbase/Makefile
 
 .PHONY: help all core plugins testplugin clean ircbase

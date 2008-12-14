@@ -43,3 +43,13 @@ IPluginCommand* IRCBase::findCommand(string name){
     }
     return (IPluginCommand*)0;
 }
+
+extern "C" IPlugin* create_plugin(){
+    string name("ircbase");
+    return (IPlugin*)new IRCBase(name);
+}
+
+extern "C" bool destroy_plugin(IPlugin* plugin){
+    delete plugin;
+    return true;
+}
