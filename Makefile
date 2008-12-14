@@ -25,7 +25,7 @@ testplugin:
 		@if [ -d ./plugs ]; then mv libtestplugin.so.1.0.0 ./plugs; fi
 
 ircbase:
-		@echo "Plug-in ircbase is not yet available"
+		@make -f ./plugs/ircbase/Makefile
 
 plugins: testplugin ircbase
 

@@ -52,6 +52,7 @@ int main(int argc, char** argv){
 
     if(sentry == 0){
         sentry = new Sentry();
+        sentry->setContext(Sentry::CONTEXT_LIVE);
     }
     sentry->loadPlugins();
     delete sentry;

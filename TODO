@@ -1,2 +1,3 @@
 * Revise the code to use initialization lists where possible
 * Make SentryConfig and SentryConfigSection not such a syntax bitch
+* Create irc-base plug-in

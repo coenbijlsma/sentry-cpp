@@ -31,18 +31,27 @@ using std::vector;
  * @brief The IRC base plug-in
  * @author $Author $
  * @copyright Copyright (C) 2008 by Coen Bijlsma
- * @since 2008-11-20
+ * @since 2008-12-14
  * @changed $Date$
  * @version $Id$
  * @url $HeadURL$
  */
 class IRCBase : public IPlugin {
 private:
+
+    IPluginProvider* _provider;
+    string _name;
+    vector<IHookPoint*> _providingHookPoints;
+    vector<string> _dependencies;
+    vector<IPluginCommand*> _commands;
+    
 public:
 
-    IRCBase();
+    IRCBase(string name);
     virtual ~IRCBase();
 
+    void setProvider(IPluginProvider* provider);
+    
     string getName();
 
     vector<IHookPoint*> getProvidingHookPoints();

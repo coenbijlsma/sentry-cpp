@@ -94,7 +94,18 @@ Sentry::~Sentry() throw(){
 }
 
 void Sentry::setContext(context_t context){
+    switch(context){
+        case Sentry::CONTEXT_DEBUG:
+            Logger::log("Context is DEBUG", Logger::LOG_INFO); break;
+        case Sentry::CONTEXT_LIVE:
+        default:
+            Logger::log("Context is LIVE", Logger::LOG_INFO); break;
+    }
     _context = context;
+}
+
+Sentry::context_t Sentry::getContext(){
+    return _context;
 }
 
 void Sentry::loadPlugins(){

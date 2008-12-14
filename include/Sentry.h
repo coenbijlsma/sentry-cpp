@@ -49,9 +49,10 @@ using std::string;
  * The whole idea is that Sentry provides a number of hooks any plug-in command
  * can hold onto, and be executed when described in the hook defenition.
  *
- * At the moment, Sentry provides two hookpoints:
+ * At the moment, Sentry provides three hookpoints:
  * - core.post_startup
  * - core.pre_shutdown
+ * - core.post_load_plugins
  * The loaded plug-in commands are then respectively executed when Sentry has
  * started, and before Sentry shuts down.
  * If you create your own plug-in, you can define your own hookpoints. For
@@ -110,7 +111,15 @@ public:
     /* Destructor */
     ~Sentry() throw();
 
+    /**
+     * Sets the context for the current run of Sentry
+     */
     void setContext(context_t context);
+
+    /**
+     * Returns the context Sentry currently runs in.
+     */
+    context_t getContext();
 
     /**
      * Loads the plugins
