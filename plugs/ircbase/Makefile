@@ -10,7 +10,7 @@ all: clean
 		./plugs/ircbase/EnqueueMessageCommand.cpp
 		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
 		./plugs/ircbase/IRCSocket.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall -combine \
+		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
 		./plugs/ircbase/IRCBase.cpp 
 		g++ -g3 -shared -Wl,-soname,libircbase.so.1 -o ./libircbase.so.1.0.0 \
 		./SentryConfigSection.o ./SentryConfig.o ./EnqueueMessageCommand.o \
