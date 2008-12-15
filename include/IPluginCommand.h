@@ -67,6 +67,18 @@ public:
      * @brief The hookpoints this command is attached to.
      */
     virtual map<string, IHookPoint*> getHookPoints() =0;
+
+    /**
+     * @brief Adds the given hookpoint to the list of hookpoints this command
+     * is attached to.
+     */
+    virtual void addAttachedHookPoint(IHookPoint* hookpoint) =0;
+
+    /**
+     * @brief Removes the given hookpoint to the list of hookpoints this command
+     * is attached to.
+     */
+    virtual void removeAttachedHookPoint(IHookPoint* hookpoint) =0;
     
     /**
      * @brief Executes the command with the given parameters.

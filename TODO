@@ -1,3 +1,7 @@
 * Revise the code to use initialization lists where possible
 * Make SentryConfig and SentryConfigSection not such a syntax bitch
 * Create irc-base plug-in
+* Improve overall Makefile quality
+* Logger::log(...) should not be static
+* Logger has to be extended into a number of subclasses, each with their
+  own target (stdout/stderr, file, db, ..)

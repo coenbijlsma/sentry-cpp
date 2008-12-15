@@ -24,6 +24,8 @@
 using std::string;
 using std::map;
 
+class IPluginCommand;
+
 /**
  * @brief Interface for hookpoints.
  * @author $Author$

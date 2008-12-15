@@ -23,6 +23,8 @@
 #include "IPlugin.h"
 #include "IHookPoint.h"
 #include "IPluginCommand.h"
+#include "IRCSocket.h"
+#include "SentryConfig.h"
 
 using std::string;
 using std::vector;
@@ -35,6 +37,14 @@ using std::vector;
  * @changed $Date$
  * @version $Id$
  * @url $HeadURL$
+ *
+ * This class provides some IRC functionality for usage by other
+ * Sentry plug-ins. The functionality this plug-in offers is very basic: it
+ * attaches to the hookpoint core.post_load_plugins and when executed
+ * creates a connection as specified in the configuration of the plug-in.
+ * This plug-in provides the following hookpoint:
+ * - ircbase.post_receive
+ *
  */
 class IRCBase : public IPlugin {
 private:
@@ -44,12 +54,22 @@ private:
     vector<IHookPoint*> _providingHookPoints;
     vector<string> _dependencies;
     vector<IPluginCommand*> _commands;
+    vector<string> _messageQueue; // queue of messages to be sent over the socket
+    
+    IRCSocket* _socket;
+
+    SentryConfig* _config;
+
+    void _setupCommands();
     
 public:
 
-    IRCBase(string name);
+    IRCBase(string name) throw(string);
+
     virtual ~IRCBase();
 
+    /* IPlugin functions */
+    
     void setProvider(IPluginProvider* provider);
     
     string getName();
@@ -61,6 +81,9 @@ public:
     vector<IPluginCommand*> getCommands();
 
     IPluginCommand* findCommand(string name);
+
+    /* IRCBase functions */
+    void enqueue(string message);
 };
 
 #endif	/* IRCBASE_H */

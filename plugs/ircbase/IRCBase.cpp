@@ -1,7 +1,13 @@
-#include "IRCBase.h"
 
-IRCBase::IRCBase(string name){
+#include <vector>
+#include "IRCBase.h"
+#include "Logger.h"
+#include "EnqueueMessageCommand.h"
+
+IRCBase::IRCBase(string name) throw(string){
     _name = name;
+    _config = new SentryConfig("./ircbase.conf");
+    _setupCommands();
 }
 
 IRCBase::~IRCBase(){
@@ -12,6 +18,14 @@ IRCBase::~IRCBase(){
     for(vector<IPluginCommand*>::iterator it = _commands.begin(); it != _commands.end(); it++){
         delete *it;
     }
+}
+
+void IRCBase::_setupCommands(){
+    IPluginCommand* enqueue_message = new EnqueueMessageCommand(this);
+
+    // do stuff
+
+    _commands.push_back(enqueue_message);
 }
 
 void IRCBase::setProvider(IPluginProvider* provider){
@@ -42,6 +56,10 @@ IPluginCommand* IRCBase::findCommand(string name){
         }
     }
     return (IPluginCommand*)0;
+}
+
+void IRCBase::enqueue(string message){
+    _messageQueue.push_back(message);
 }
 
 extern "C" IPlugin* create_plugin(){
