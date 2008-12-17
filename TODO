@@ -1,3 +1,4 @@
+-- SENTRY --
 * Revise the code to use initialization lists where possible
 * Make SentryConfig and SentryConfigSection not such a syntax bitch
 * Create irc-base plug-in
@@ -5,3 +6,9 @@
 * Logger::log(...) should not be static
 * Logger has to be extended into a number of subclasses, each with their
   own target (stdout/stderr, file, db, ..)
+* Enable config files to include and/or extend others
+
+-- IRCBASE --
+* Create a Buffer class to neatly handle network traffic
+* Move the thread creation out of IRCBase::IRCBase(), and chain it 
+  to a hookpoint.

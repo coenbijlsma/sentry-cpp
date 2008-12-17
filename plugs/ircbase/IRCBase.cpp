@@ -1,22 +1,49 @@
 
 #include <vector>
+#include <stdlib.h>
+#include <pthread.h>
+
+#include "IRCSocket.h"
 #include "IRCBase.h"
 #include "Logger.h"
 #include "EnqueueMessageCommand.h"
 
 IRCBase::IRCBase(string name) throw(string){
+    Logger::setDestination(Logger::DEST_STDOUT);
+    Logger::setlogFile("sentry.log");
     _name = name;
     _config = new SentryConfig("./ircbase.conf");
     _setupCommands();
+    if(_connect()){
+        _socket->sendMessage("PASS foo\r\n");
+        _socket->sendMessage("NICK sentry`\r\n");
+        _socket->sendMessage("USER Sentry` foo bar Sentry`\r\n");
+        _socket->sendMessage("JOIN " + _config->getValue("connection", "channel") + "\r\n");
+
+        /* Setup the thread to listen to incoming data */
+        _doListen = false;
+        pthread_t listener;
+        int li = pthread_create(&listener, NULL, IRCBase::_listen, (void*)this );
+        pthread_join(listener, NULL);
+    }
+
 }
 
 IRCBase::~IRCBase(){
+    /* Stop the listening thread */
+    _doListen = false;
+
     for(vector<IHookPoint*>::iterator it = _providingHookPoints.begin(); it != _providingHookPoints.end(); it++){
         delete *it;
     }
 
     for(vector<IPluginCommand*>::iterator it = _commands.begin(); it != _commands.end(); it++){
         delete *it;
+    }
+
+    if(_socket){
+        Logger::log("Deleting socket", Logger::LOG_INFO);
+        delete _socket;
     }
 }
 
@@ -26,6 +53,40 @@ void IRCBase::_setupCommands(){
     // do stuff
 
     _commands.push_back(enqueue_message);
+}
+
+bool IRCBase::_connect(){
+    if(_socket == 0){
+        try{
+            string host = _config->getValue("connection", "host");
+            int port = atoi(_config->getValue("connection", "port").c_str());
+            _socket = new IRCSocket(const_cast<char*>(host.c_str()), port);
+            if(_socket->createConnection()){
+                Logger::log("Connected to " + host + ":" + _config->getValue("connection", "port"), Logger::LOG_INFO);
+            }else{
+                Logger::log("Could not connect to " + host + ":" + _config->getValue("connection", "port"), Logger::LOG_WARNING);
+            }
+        }catch(string message){
+            Logger::log(message, Logger::LOG_ERROR);
+        }
+    }
+
+    // Return if we already are connected
+    return true;
+}
+
+void IRCBase::__listen(){
+    while(_doListen){
+        Logger::log(_socket->readMessage("\r\n"), Logger::LOG_INFO);
+    }
+    Logger::log("No longer listening", Logger::LOG_INFO);
+}
+
+void* IRCBase::_listen(void* ptr){
+    IRCBase* ircbase = (IRCBase*)ptr;
+    ircbase->_doListen = true;
+    ircbase->__listen();
+    return 0;
 }
 
 void IRCBase::setProvider(IPluginProvider* provider){

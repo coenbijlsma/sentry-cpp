@@ -1,5 +1,6 @@
 #include "IRCSocket.h"
 #include "Logger.h"
+#include <fcntl.h>
 
 IRCSocket::IRCSocket(char* host, int port){
     _port = port;
@@ -32,6 +33,11 @@ bool IRCSocket::createConnection(){
         Logger::log("In IRCSocket::createConnection() " + string(errmsg), Logger::LOG_ERROR);
         return false;
     }
+
+    /* set-up non-blocking socket */
+    int flags = fcntl(_sockfd, F_GETFL, 0);
+    flags |= O_NONBLOCK;
+    fcntl(_sockfd, flags, 0);
 
     memset(&_addr, 0, sizeof(_addr));
     _addr.sin_family = AF_INET;
@@ -94,6 +100,8 @@ bool IRCSocket::sendMessage(string msg){
         char* errmsg = strerror(errno);
         Logger::log("In IRCSocket::sendMessage() " + string(errmsg), Logger::LOG_ERROR);
         return false;
+    }else{
+        Logger::log("Successfully sent message " + msg, Logger::LOG_INFO);
     }
 
     return true;

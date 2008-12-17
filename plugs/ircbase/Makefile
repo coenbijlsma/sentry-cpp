@@ -14,7 +14,7 @@ all: clean
 		./plugs/ircbase/IRCBase.cpp 
 		g++ -g3 -shared -Wl,-soname,libircbase.so.1 -o ./libircbase.so.1.0.0 \
 		./SentryConfigSection.o ./SentryConfig.o ./EnqueueMessageCommand.o \
-		IRCSocket.o ./IRCBase.o ./Logger.o ./StringTokenizer.o -lc
+		IRCSocket.o ./IRCBase.o ./Logger.o ./StringTokenizer.o -lc -lpthread
 		@mv ./libircbase.so.1.0.0 ./plugs/
 
 clean:

@@ -57,6 +57,12 @@ public:
 
     void removeAttachedHookPoint(IHookPoint* hookpoint);
 
+    /**
+     * Executes the command, effectively adding
+     * the messages in params to the queue of messages to be sent.
+     * @param vector<string> Each item in the vector must contain
+     * a RFC 1459 formatted message, otherwise sending it wil fail.
+     */
     void execute(vector<string> params);
 };
 

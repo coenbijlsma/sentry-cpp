@@ -62,7 +62,6 @@ Sentry::Sentry(){
     }else{
         _executeCommandsIn(post_startup);
     }
-    
 }
 
 /* Destructor */

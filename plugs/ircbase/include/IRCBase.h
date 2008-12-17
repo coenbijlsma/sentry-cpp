@@ -55,12 +55,29 @@ private:
     vector<string> _dependencies;
     vector<IPluginCommand*> _commands;
     vector<string> _messageQueue; // queue of messages to be sent over the socket
+    bool _doListen;
     
     IRCSocket* _socket;
 
     SentryConfig* _config;
 
     void _setupCommands();
+
+    /*
+     * Connects to the server specified in the config file of thie plug-in,
+     * and tries to register at the channel.
+     */
+    bool _connect();
+
+    /**
+     * Does the actual listening
+     */
+    void __listen();
+
+    /**
+     * 
+     */
+    static void* _listen(void* ptr);
     
 public:
 
@@ -83,7 +100,12 @@ public:
     IPluginCommand* findCommand(string name);
 
     /* IRCBase functions */
+
+    /**
+     * Enqueues the given string to send it later on.
+     */
     void enqueue(string message);
+
 };
 
 #endif	/* IRCBASE_H */
