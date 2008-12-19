@@ -82,7 +82,7 @@ public:
     
     /**
      * Reads a line from the input stream and returns it, discarding the
-     * newwline character.. Note that this call blocks until a newlihe
+     * newline character.. Note that this call blocks until a newlihe
      * character (\n) is encountered.
      *@return string The line.
      */

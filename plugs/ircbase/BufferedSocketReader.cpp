@@ -85,5 +85,5 @@ string BufferedSocketReader::read(string delim, bool includeDelim){
 }
 
 string BufferedSocketReader::readLine(){
-    return this->read("\n");
+    return this->read("\n", false);
 }
