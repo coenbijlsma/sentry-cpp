@@ -128,7 +128,7 @@ string IRCSocket::readMessage(string delim){
                 return temp_msg;
             case -1:
                 free(chars);
-                Logger::log("In IRCSocket::readMessage() Error receiving data", Logger::LOG_ERROR);;
+                Logger::log("In IRCSocket::readMessage() Error receiving data", Logger::LOG_ERROR);
                 return temp_msg;
             default:
                 temp_msg.append(chars);
