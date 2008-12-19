@@ -28,7 +28,7 @@ bool BufferedSocketWriter::_write(){
 
     while( ! _buffer.empty() ){
         string message = _buffer.at(0);
-        int bytes_to_write = message.size();
+        int bytes_to_write = strlen(message.c_str());
         
         while(bytes_to_write != 0){
             int poll_result = poll(_pfd, 1, _pollTimeout);
@@ -42,14 +42,16 @@ bool BufferedSocketWriter::_write(){
 
             int send_result = send(_fd, message.c_str(), strlen(message.c_str()), MSG_DONTWAIT );
             if(send_result != -1){
-                bytes_to_write -= send_result;
-                _buffer.erase(_buffer.begin());
+                bytes_to_write -= send_result; //
+                if(bytes_to_write != 0){
+                    message = message[send_result];
+                }
             }else{
                 string errmsg(strerror(errno));
                 Logger::log(errmsg, Logger::LOG_WARNING);
             }
-
         }
+        _buffer.erase(_buffer.begin());
     }
     return true;
 }
