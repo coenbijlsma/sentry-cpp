@@ -19,6 +19,7 @@
 #define	IRCSOCKET_H
 
 #include "BufferedSocketReader.h"
+#include "BufferedSocketWriter.h"
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
@@ -53,6 +54,7 @@ private:
         char* _host;
         string _protocol;
         BufferedSocketReader* _br;
+        BufferedSocketWriter* _bw;
 
 public:
 

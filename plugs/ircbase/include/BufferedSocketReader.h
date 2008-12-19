@@ -18,7 +18,6 @@
 #ifndef BUFFEREDSOCKETREADER_H
 #define	BUFFEREDSOCKETREADER_H
 
-
 #include <string>
 #include <vector>
 

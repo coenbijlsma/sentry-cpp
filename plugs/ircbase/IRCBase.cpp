@@ -77,7 +77,10 @@ bool IRCBase::_connect(){
 
 void IRCBase::__listen(){
     while(_doListen){
-        Logger::log(_socket->readMessage("\r\n"), Logger::LOG_INFO);
+        string message = _socket->readMessage("\r\n");
+        if(message.size() > 0){
+            Logger::log(message, Logger::LOG_INFO);
+        }
     }
     Logger::log("No longer listening", Logger::LOG_INFO);
 }

@@ -35,6 +35,7 @@ bool IRCSocket::createConnection(){
     }
 
     _br = new BufferedSocketReader(_sockfd, false, 512);
+    _bw = new BufferedSocketWriter(_sockfd, 513, 10);
 
     /* set-up non-blocking socket */
     /*
@@ -87,13 +88,16 @@ bool IRCSocket::disconnect(){
 }
 
 bool IRCSocket::sendMessage(string msg){
-    int bytes_sent;
+    //int bytes_sent;
 
     if( ! _connected){
         Logger::log("In IRCSocket::sendMessage()  Not connected", Logger::LOG_WARNING);
         return false;
     }
 
+    _bw->write(msg);
+    _bw->flush();
+    /*
     if(msg[strlen(msg.c_str())] != '\0'){
         msg += '\0';
     }
@@ -106,6 +110,7 @@ bool IRCSocket::sendMessage(string msg){
     }else{
         Logger::log("Successfully sent message " + msg, Logger::LOG_INFO);
     }
+    */
 
     return true;
 }
