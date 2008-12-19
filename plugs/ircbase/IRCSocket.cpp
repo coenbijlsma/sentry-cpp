@@ -34,11 +34,14 @@ bool IRCSocket::createConnection(){
         return false;
     }
 
+    _br = new BufferedSocketReader(_sockfd, false, 512);
+
     /* set-up non-blocking socket */
+    /*
     int flags = fcntl(_sockfd, F_GETFL, 0);
     flags |= O_NONBLOCK;
     fcntl(_sockfd, flags, 0);
-
+    */
     memset(&_addr, 0, sizeof(_addr));
     _addr.sin_family = AF_INET;
     _addr.sin_port = htons(_port);
@@ -113,38 +116,8 @@ string IRCSocket::readMessage(string delim){
         Logger::log("In IRCSocket::readMessage() Not connected", Logger::LOG_WARNING);
         return temp_msg;
     }
-
-    /*
-    XXX Maybe fix this?
-
-    */
-    while(temp_msg.size() <= 512){
-        char* chars = (char*)malloc(513);
-        memset(chars, 0, 513);
-
-        switch(recv(_sockfd, chars, 512, 0)){
-            case 0:
-                free(chars);
-                return temp_msg;
-            case -1:
-                free(chars);
-                Logger::log("In IRCSocket::readMessage() Error receiving data", Logger::LOG_ERROR);
-                return temp_msg;
-            default:
-                temp_msg.append(chars);
-        }
-
-        if(temp_msg.size() >= delim.size()){
-            if(temp_msg.substr(temp_msg.size() - delim.size()) == delim){
-                free(chars);
-                return temp_msg;
-            }
-        }
-        if(chars != 0){
-            free(chars);
-        }
-    }
-
+    temp_msg = _br->read(delim);
+    
     return temp_msg;
 }
 

@@ -39,7 +39,7 @@ using std::vector;
  */ 
 class BufferedSocketReader {
 private:
-    const int _bufsize = 513;
+    const int _bufsize;
     
     int _fd;
     bool _blocking;
@@ -49,11 +49,43 @@ private:
     
 public:
 
-    BufferedSocketReader(int fd, bool blocking = true);
+    /**
+     * Constructor.
+     * @param int fd The file descriptor of the socket.
+     * @param bool blocking Whether or not the reading should
+     * @param bufsize int The maximum size of the buffer
+     * block or not. This is nog possible if you use
+     * BufferedSocketReader::readLine()
+     */
+    BufferedSocketReader(int fd, bool blocking = true, int bufsize = 513);
+
+    /**
+     * Destructor.
+     */
     ~BufferedSocketReader();
 
-    char read();
+    /**
+     * Reads the next byte from the socket.
+     * If there is nothing to be read or the connection is closed,
+     * this function returns -1.
+     *@return int The next char from the stream
+     */
+    int read();
 
+
+    /**
+     * Reads a string from the input stream, until delim is encountered.
+     * Note that this call blocks until delim is found.
+     * @return string The string.
+     */
+    string read(string delim, bool includeDelim = false);
+    
+    /**
+     * Reads a line from the input stream and returns it, discarding the
+     * newwline character.. Note that this call blocks until a newlihe
+     * character (\n) is encountered.
+     *@return string The line.
+     */
     string readLine();
 
 };

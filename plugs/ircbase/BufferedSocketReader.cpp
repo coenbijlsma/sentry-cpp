@@ -1,16 +1,24 @@
 #include "BufferedSocketReader.h"
+#include "Logger.h"
 #include <fcntl.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h> /* For recv() */
+#include <sys/socket.h> /* For recv() */
 
-BufferedSocketReader::BufferedSocketReader(int fd, bool blocking){
+#include <iostream>
+
+using std::cout;
+using std::endl;
+
+BufferedSocketReader::BufferedSocketReader(int fd, bool blocking, int bufsize) : _bufsize(bufsize) {
     _fd = fd;
     _blocking = blocking;
 
     if(!_blocking){
-        int flags = fcntl(_sockfd, F_GETFL, 0);
+        int flags = fcntl(_fd, F_GETFL, 0);
         flags |= O_NONBLOCK;
-        fcntl(_sockfd, flags, 0);
+        fcntl(_fd, flags, 0);
     }
 }
 
@@ -19,11 +27,10 @@ BufferedSocketReader::~BufferedSocketReader(){
 }
 
 void BufferedSocketReader::_fillBuffer(){
-
     char* newbuf = (char*)malloc(this->_bufsize +1);
     memset(newbuf, 0, this->_bufsize +1);
 
-    switch(recv(_fd, chars, this->_bufsize, 0)){
+    switch(recv(_fd, newbuf, this->_bufsize, 0)){
         case 0:
             // shutdown
             break;
@@ -31,10 +38,10 @@ void BufferedSocketReader::_fillBuffer(){
             // error
             break;
         default:
-            while(newbuf){
-                _buffer.push_back(*newbuf);
-                newbuf++;
+            for(unsigned int i = 0; i <= strlen(newbuf); i++){
+                _buffer.push_back(newbuf[i]);
             }
+
             break;
     }
 
@@ -55,12 +62,28 @@ int BufferedSocketReader::read(){
     }
 }
 
-string BufferedSocketReader::readLine(){
-    string line;
+string BufferedSocketReader::read(string delim, bool includeDelim){
+    string ret("");
+    int i;
+    
+    while( (i = this->read()) != -1){
+        ret.append(1, (char)i);
 
-    while( (char c = (char)this->read()) != '\n' ){
-        line.append(1, c);
+        if(ret.length() >= delim.length()){
+            if(ret.substr(ret.size() - delim.size()) == delim){
+                // return the delimeter?
+                if(includeDelim){
+                    return ret;
+                }else{
+                    return ret.substr(0, ret.size() - delim.size());
+                }
+            }
+        }
     }
 
-    return line;
+    return ret;
+}
+
+string BufferedSocketReader::readLine(){
+    return this->read("\n");
 }

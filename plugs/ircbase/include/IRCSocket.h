@@ -18,6 +18,7 @@
 #ifndef IRCSOCKET_H
 #define	IRCSOCKET_H
 
+#include "BufferedSocketReader.h"
 #include <string>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,6 +52,7 @@ private:
         bool _connected;
         char* _host;
         string _protocol;
+        BufferedSocketReader* _br;
 
 public:
 
