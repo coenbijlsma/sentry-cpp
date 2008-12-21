@@ -25,64 +25,69 @@
 using std::string;
 using std::map;
 
-/**
- * @brief HookPoint implementation for Sentry.
- * @author $Author$
- * @copyright Copyright (C) 2008 by Coen Bijlsma
- * @since 2008-11-20
- * @changed $Date$
- * @version $Id$
- * @url $HeadURL$
- * @see Sentry.h
- *
- * This class is an implementation of the IHookPoint interface.
- * Sentry provides a number of hookpoints; you can find their
- * descriptions in the Sentry.h file.
- */
-class SentryHookPoint : public IHookPoint {
-private:
-    string _name;
-    map<string, IPluginCommand*> _attachedPluginCommands;
-    
-    map<string, IPluginCommand*>::iterator _findPluginCommand(string name);
-public:
-    
+using sentry::IHookPoint;
+using sentry::IPluginCommand;
+
+namespace sentry {
     /**
-     * Creates a HookPoint that has the given name.
-     * @brief Constructor
+     * @brief HookPoint implementation for Sentry.
+     * @author $Author$
+     * @copyright Copyright (C) 2008 by Coen Bijlsma
+     * @since 2008-11-20
+     * @changed $Date$
+     * @version $Id$
+     * @url $HeadURL$
+     * @see Sentry.h
+     *
+     * This class is an implementation of the IHookPoint interface.
+     * Sentry provides a number of hookpoints; you can find their
+     * descriptions in the Sentry.h file.
      */
-    SentryHookPoint(string name) throw();
-    
-    /**
-     * @brief Destructor
-     */
-    virtual ~SentryHookPoint();
-    
-    /**
-     * @brief Returns the name of this hookpoint.
-     */
-    string getName() throw();
-    
-    /**
-     * @brief Returns the attached plug-in commands.
-     */
-    map<string, IPluginCommand*> getAttachedPluginCommands() throw();
-    
-    /**
-     * @brief Returns the IPluginCommand with the given name.
-     */
-    IPluginCommand* findPluginCommand(string name) throw();
-    
-    
-    /**
-     * @brief Adds the given plug-in command to the list.
-     */
-    void attach(IPluginCommand* command) throw();
-    
-    /**
-     * @brief Removes the given plug-in command from the list.
-     */
-    bool detach(IPluginCommand* command) throw();
-};
+    class SentryHookPoint : public IHookPoint {
+    private:
+        string _name;
+        map<string, IPluginCommand*> _attachedPluginCommands;
+
+        map<string, IPluginCommand*>::iterator _findPluginCommand(string name);
+    public:
+
+        /**
+         * Creates a HookPoint that has the given name.
+         * @brief Constructor
+         */
+        SentryHookPoint(string name) throw();
+
+        /**
+         * @brief Destructor
+         */
+        virtual ~SentryHookPoint();
+
+        /**
+         * @brief Returns the name of this hookpoint.
+         */
+        string getName() throw();
+
+        /**
+         * @brief Returns the attached plug-in commands.
+         */
+        map<string, IPluginCommand*> getAttachedPluginCommands() throw();
+
+        /**
+         * @brief Returns the IPluginCommand with the given name.
+         */
+        IPluginCommand* findPluginCommand(string name) throw();
+
+
+        /**
+         * @brief Adds the given plug-in command to the list.
+         */
+        void attach(IPluginCommand* command) throw();
+
+        /**
+         * @brief Removes the given plug-in command from the list.
+         */
+        bool detach(IPluginCommand* command) throw();
+    };
+}
 
 #endif

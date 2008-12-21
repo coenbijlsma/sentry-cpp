@@ -17,7 +17,7 @@
 
 #include "StringTokenizer.h"
 
-StringTokenizer::StringTokenizer(string seq, char delim){
+sentry::StringTokenizer::StringTokenizer(string seq, char delim){
         char* ptr;
         if(seq.c_str() == '\0'){
                 fprintf(stderr, "The sequence to be checked cannot be NULL.\n");
@@ -52,20 +52,20 @@ StringTokenizer::StringTokenizer(string seq, char delim){
         _count = 0;
 }
 
-StringTokenizer::~StringTokenizer(){
+sentry::StringTokenizer::~StringTokenizer(){
         free(_currentToken);
         free(_nextToken);
         free(_sequence);
 }
 
-bool StringTokenizer::hasNext(){
+bool sentry::StringTokenizer::hasNext(){
         if(_nextToken == 0){
                 return false;
         }
         return true;
 }
 
-int StringTokenizer::count(){
+int sentry::StringTokenizer::count(){
         if(_count == 0){
                 int tok = 1;
 
@@ -80,7 +80,7 @@ int StringTokenizer::count(){
         return _count;
 }
 
-string StringTokenizer::next(){
+string sentry::StringTokenizer::next(){
         char* ptr =0;
         char* ptr2 =0;
         char* retval =0;

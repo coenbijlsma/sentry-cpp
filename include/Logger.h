@@ -21,60 +21,62 @@
 
 using std::string;
 
-/**
- * @brief This class logs the given messages.
- * @author $Author$
- * @copyright Copyright (C) 2008 by Coen Bijlsma
- * @since 2008-11-20
- * @changed $Date$
- * @version $Id$
- * @url $HeadURL$
- *
- * This class logs messages throughout Sentry. If you want, you can use this
- * class in your own plug-ins to achieve a more generic way of logging for
- * the whole thing. test
- */
-class Logger {
-public:
+namespace sentry {
+    /**
+     * @brief This class logs the given messages.
+     * @author $Author$
+     * @copyright Copyright (C) 2008 by Coen Bijlsma
+     * @since 2008-11-20
+     * @changed $Date$
+     * @version $Id$
+     * @url $HeadURL$
+     *
+     * This class logs messages throughout Sentry. If you want, you can use this
+     * class in your own plug-ins to achieve a more generic way of logging for
+     * the whole thing. test
+     */
+    class Logger {
+    public:
 
-    /**
-     * The available logging levels
-     */
-    enum log_level_t {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_FATAL};
+        /**
+         * The available logging levels
+         */
+        enum log_level_t {LOG_INFO, LOG_WARNING, LOG_ERROR, LOG_FATAL};
 
-    /**
-     * The available log destinations
-     */
-    enum log_destination_t {DEST_STDOUT, DEST_FILE, DEST_DATABASE};
-    
-    /**
-     * Logs the given message. Currently this is printed to the standard
-     * outputstreams, but I plan to change that and use log4cpp for that.
-     */
-    static void log(string message, log_level_t log_level) throw();
+        /**
+         * The available log destinations
+         */
+        enum log_destination_t {DEST_STDOUT, DEST_FILE, DEST_DATABASE};
 
-    /**
-     * Sets the destination of the logfile. I already put DEST_DATABASE in
-     * the options, but that's not supported yet. If no log_destination is
-     * set, DEST_STDOUT is used.
-     */
-    static void setDestination(log_destination_t dest) throw();
+        /**
+         * Logs the given message. Currently this is printed to the standard
+         * outputstreams, but I plan to change that and use log4cpp for that.
+         */
+        static void log(string message, log_level_t log_level) throw();
 
-    /**
-     * Sets the full path to the logfile
-     */
-    static void setlogFile(string filepath) throw();
+        /**
+         * Sets the destination of the logfile. I already put DEST_DATABASE in
+         * the options, but that's not supported yet. If no log_destination is
+         * set, DEST_STDOUT is used.
+         */
+        static void setDestination(log_destination_t dest) throw();
 
-private:
-    /**
-     * The destination of the logges messages
-     */
-    static log_destination_t log_destination;
+        /**
+         * Sets the full path to the logfile
+         */
+        static void setlogFile(string filepath) throw();
 
-    /**
-     * The logfile in case the logging is done to a file
-     */
-    static string logfile;
-};
+    private:
+        /**
+         * The destination of the logges messages
+         */
+        static log_destination_t log_destination;
+
+        /**
+         * The logfile in case the logging is done to a file
+         */
+        static string logfile;
+    };
+}
 
 #endif

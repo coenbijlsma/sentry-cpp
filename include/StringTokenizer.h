@@ -24,58 +24,60 @@
 
 using std::string;
 
-/**
- * @brief Class for splitting strings into tokens
- * @author $Author$
- * @copyright Copyright (C) 2008 by Coen Bijlsma
- * @since 2008-11-20
- * @changed $Date$
- * @version $Id$
- * @url $HeadURL$
- *
- * This class takes a string and chops it up into pieces.
- */
-class StringTokenizer {
-private:
-        char* _sequence;
-        char _delimeter;
+namespace sentry {
+    /**
+     * @brief Class for splitting strings into tokens
+     * @author $Author$
+     * @copyright Copyright (C) 2008 by Coen Bijlsma
+     * @since 2008-11-20
+     * @changed $Date$
+     * @version $Id$
+     * @url $HeadURL$
+     *
+     * This class takes a string and chops it up into pieces.
+     */
+    class StringTokenizer {
+    private:
+            char* _sequence;
+            char _delimeter;
 
-        int _currentLoc;
-        int _count;
-        char* _currentToken;
-        char* _nextToken;
+            int _currentLoc;
+            int _count;
+            char* _currentToken;
+            char* _nextToken;
 
-public:
+    public:
 
-        /*
-         * Constructor.
-         * Initializes the tokenizer and its tokens.
-         */
-        StringTokenizer(string seq, char delim);
+            /*
+             * Constructor.
+             * Initializes the tokenizer and its tokens.
+             */
+            StringTokenizer(string seq, char delim);
 
-        /*
-         * Destructor.
-         * Cleans up and exits.
-         */
-        virtual ~StringTokenizer();
+            /*
+             * Destructor.
+             * Cleans up and exits.
+             */
+            virtual ~StringTokenizer();
 
-        /*
-         * Returns whether there are any tokens left
-         * after the current position.
-         */
-        bool hasNext();
+            /*
+             * Returns whether there are any tokens left
+             * after the current position.
+             */
+            bool hasNext();
 
-        /*
-         * Returns tne amount of tokens there are
-         * in the string.
-         */
-        int count();
+            /*
+             * Returns tne amount of tokens there are
+             * in the string.
+             */
+            int count();
 
-        /*
-         * Returns the next token after
-         * the current position.
-         */
-        string next();
-};
+            /*
+             * Returns the next token after
+             * the current position.
+             */
+            string next();
+    };
+}
 
 #endif /* STRINGTOKENIZER_H */

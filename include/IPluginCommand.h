@@ -27,67 +27,69 @@ using std::map;
 using std::string;
 using std::vector;
 
-class IPlugin;
-class IHookPoint;
-
-/**
- * @brief Interface for plug-in commands.
- * @author $Author$
- * @copyright Copyright (C) 2008 by Coen Bijlsma
- * @since 2008-11-20
- * @changed $Date$
- * @version $Id$
- * @url $HeadURL$
- *
- * This interface is used by Sentry to work with plug-in commands.
- * If you want to write your own plug-ins, you have to implement this
- * interface.
- */
-class IPluginCommand {
-public:
-
-    /**
-     * Destructor
-     */
-    virtual ~IPluginCommand(){};
+namespace sentry {
+    class IPlugin;
+    class IHookPoint;
     
     /**
-     * @brief Returns the IPlugin* this IPluginCommand* belongs to.
+     * @brief Interface for plug-in commands.
+     * @author $Author$
+     * @copyright Copyright (C) 2008 by Coen Bijlsma
+     * @since 2008-11-20
+     * @changed $Date$
+     * @version $Id$
+     * @url $HeadURL$
+     *
+     * This interface is used by Sentry to work with plug-in commands.
+     * If you want to write your own plug-ins, you have to implement this
+     * interface.
      */
-    virtual IPlugin* getPlugin() =0;
-    
-    /**
-     * @brief Returns the name of this command.
-     * To avoid ambiguous command names, the names must
-     * be in the form <plugin_name>.<command_name>
-     */
-    virtual string getName() =0;
-    
-    /**
-     * @brief The hookpoints this command is attached to.
-     */
-    virtual map<string, IHookPoint*> getHookPoints() =0;
+    class IPluginCommand {
+    public:
 
-    /**
-     * @brief Adds the given hookpoint to the list of hookpoints this command
-     * is attached to.
-     */
-    virtual void addAttachedHookPoint(IHookPoint* hookpoint) =0;
+        /**
+         * Destructor
+         */
+        virtual ~IPluginCommand(){};
 
-    /**
-     * @brief Removes the given hookpoint to the list of hookpoints this command
-     * is attached to.
-     */
-    virtual void removeAttachedHookPoint(IHookPoint* hookpoint) =0;
-    
-    /**
-     * @brief Executes the command with the given parameters.
-     * This method executes the command with the given parameters.
-     * To be clear about what parameters are expected for each command,
-     * I recommend putting the requirements in the header file(s) of
-     * your own commands.
-     */
-    virtual void execute(vector<string> params) =0;
-};
+        /**
+         * @brief Returns the IPlugin* this IPluginCommand* belongs to.
+         */
+        virtual IPlugin* getPlugin() =0;
+
+        /**
+         * @brief Returns the name of this command.
+         * To avoid ambiguous command names, the names must
+         * be in the form <plugin_name>.<command_name>
+         */
+        virtual string getName() =0;
+
+        /**
+         * @brief The hookpoints this command is attached to.
+         */
+        virtual map<string, IHookPoint*> getHookPoints() =0;
+
+        /**
+         * @brief Adds the given hookpoint to the list of hookpoints this command
+         * is attached to.
+         */
+        virtual void addAttachedHookPoint(IHookPoint* hookpoint) =0;
+
+        /**
+         * @brief Removes the given hookpoint to the list of hookpoints this command
+         * is attached to.
+         */
+        virtual void removeAttachedHookPoint(IHookPoint* hookpoint) =0;
+
+        /**
+         * @brief Executes the command with the given parameters.
+         * This method executes the command with the given parameters.
+         * To be clear about what parameters are expected for each command,
+         * I recommend putting the requirements in the header file(s) of
+         * your own commands.
+         */
+        virtual void execute(vector<string> params) =0;
+    };
+}
 
 #endif

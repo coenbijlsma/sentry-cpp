@@ -3,14 +3,8 @@
 #include <dlfcn.h>
 #include <iostream>
 
-/*
-using std::cerr;
-using std::cout;
-using std::endl;
-*/
-
 /* Retrieve the library from the given path */
-void* PluginLoader::_getLib(string libpath) throw (NoSuchLibraryException){
+void* sentry::PluginLoader::_getLib(string libpath) throw (NoSuchLibraryException){
     void* lib = dlopen(libpath.c_str(), RTLD_LAZY);
     
     if( ! lib ){
@@ -23,7 +17,7 @@ void* PluginLoader::_getLib(string libpath) throw (NoSuchLibraryException){
 }
 
 /* Loads the plug-in from the given path */
-IPlugin* PluginLoader::loadPlugin(string libpath, IPluginProvider* provider) throw (NoSuchLibraryException, NoSuchSymbolException){
+sentry::IPlugin* sentry::PluginLoader::loadPlugin(string libpath, IPluginProvider* provider) throw (NoSuchLibraryException, NoSuchSymbolException){
     void* lib = _getLib(libpath);
     
     /* Load the create symbol */
@@ -55,7 +49,7 @@ IPlugin* PluginLoader::loadPlugin(string libpath, IPluginProvider* provider) thr
 }
 
 /* Destroys the given IPlugin, which has to reside in the library in the given path */
-bool PluginLoader::unloadPlugin(IPlugin* plugin, string libpath) throw (NoSuchLibraryException, NoSuchSymbolException){
+bool sentry::PluginLoader::unloadPlugin(IPlugin* plugin, string libpath) throw (NoSuchLibraryException, NoSuchSymbolException){
     void* lib = _getLib(libpath);
     
     destroy_plugin_t* destroy_plugin = (destroy_plugin_t*) dlsym(lib, "destroy_plugin");

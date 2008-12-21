@@ -25,7 +25,7 @@ using std::ios_base;
 using std::ifstream;
 using std::vector;
 
-SentryConfig::SentryConfig(string filename) throw(string){
+sentry::SentryConfig::SentryConfig(string filename) throw(string){
     _filename = filename;
 
     ifstream _ifstream(_filename.c_str(), ios_base::in);
@@ -41,7 +41,7 @@ SentryConfig::SentryConfig(string filename) throw(string){
 
 }
 
-SentryConfig::~SentryConfig() throw(){
+sentry::SentryConfig::~SentryConfig() throw(){
     writeConfig();
 
     while( ! _sections.empty() ){
@@ -51,7 +51,7 @@ SentryConfig::~SentryConfig() throw(){
     }
 }
 
-void SentryConfig::_init() throw(string) {
+void sentry::SentryConfig::_init() throw(string) {
     ifstream _ifstream(_filename.c_str(), ios_base::in);
     
     if( ! _ifstream.is_open()){
@@ -127,7 +127,7 @@ void SentryConfig::_init() throw(string) {
 }
 
 /* Writes one section to the given stream */
-void SentryConfig::_writeSection(ofstream* fs, SentryConfigSection* section) throw(string) {
+void sentry::SentryConfig::_writeSection(ofstream* fs, SentryConfigSection* section) throw(string) {
     if( !fs->is_open() ){
         string error("Could not access file " + _filename);
         throw error;
@@ -159,7 +159,7 @@ void SentryConfig::_writeSection(ofstream* fs, SentryConfigSection* section) thr
 }
 
 /* Returns the section that has the given name */
-SentryConfigSection* SentryConfig::getSection(string name) throw() {
+sentry::SentryConfigSection* sentry::SentryConfig::getSection(string name) throw() {
     map<string, SentryConfigSection*>::iterator it = _sections.find(name);
 
     if(it == _sections.end()){
@@ -168,7 +168,7 @@ SentryConfigSection* SentryConfig::getSection(string name) throw() {
     return it->second;
 }
 
-string SentryConfig::getValue(string section, string setting) throw() {
+string sentry::SentryConfig::getValue(string section, string setting) throw() {
     SentryConfigSection* sec = getSection(section);
 
     if(sec == 0){
@@ -178,7 +178,7 @@ string SentryConfig::getValue(string section, string setting) throw() {
     return sec->get(setting);
 }
 
-void SentryConfig::setSetting(string section, string setting, string value) throw(string) {
+void sentry::SentryConfig::setSetting(string section, string setting, string value) throw(string) {
     SentryConfigSection* sec = getSection(section);
 
     if(sec == 0){
@@ -189,7 +189,7 @@ void SentryConfig::setSetting(string section, string setting, string value) thro
     sec->set(setting, value);
 }
 
-bool SentryConfig::writeConfig() throw() {
+bool sentry::SentryConfig::writeConfig() throw() {
     ofstream _ofstream(_filename.c_str());
 
     if(_ofstream.is_open()){

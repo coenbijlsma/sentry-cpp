@@ -27,12 +27,9 @@
 #include <string.h> /* For strcmp */
 
 using std::vector;
-//using std::cerr;
-//using std::cout;
-//using std::endl;
 
 /* Construcor */
-Sentry::Sentry(){
+sentry::Sentry::Sentry(){
     /* Load the config */
     try{
         _config = new SentryConfig("./sentry.conf");
@@ -65,7 +62,7 @@ Sentry::Sentry(){
 }
 
 /* Destructor */
-Sentry::~Sentry() throw(){
+sentry::Sentry::~Sentry() throw(){
 
     /* Execute the pre-shutdown actions */
     IHookPoint* pre_shutdown = findHookPoint("core.pre_shutdown");
@@ -92,7 +89,7 @@ Sentry::~Sentry() throw(){
 
 }
 
-void Sentry::setContext(context_t context){
+void sentry::Sentry::setContext(context_t context){
     switch(context){
         case Sentry::CONTEXT_DEBUG:
             Logger::log("Context is DEBUG", Logger::LOG_INFO); break;
@@ -103,11 +100,11 @@ void Sentry::setContext(context_t context){
     _context = context;
 }
 
-Sentry::context_t Sentry::getContext(){
+sentry::Sentry::context_t sentry::Sentry::getContext(){
     return _context;
 }
 
-void Sentry::loadPlugins(){
+void sentry::Sentry::loadPlugins(){
     string plugindir(_config->getValue("application", "plugindir") + "/");
     if(plugindir == ""){
         Logger::log("Plugin directory not in config.", Logger::LOG_FATAL);
@@ -158,7 +155,7 @@ void Sentry::loadPlugins(){
 }
 
 /* Returns the names if the files in the plug-in directory */
-vector<string> Sentry::_getPluginLibNames(string directory){
+vector<string> sentry::Sentry::_getPluginLibNames(string directory){
     vector<string> ret;
     struct dirent** files;
     
@@ -181,7 +178,7 @@ vector<string> Sentry::_getPluginLibNames(string directory){
 }
 
 /* Sets up the hookpoints for the Sentry core */
-void Sentry::_setupHookpoints(){
+void sentry::Sentry::_setupHookpoints(){
     SentryHookPoint* postStartup = new SentryHookPoint(string("core.post_startup"));
     SentryHookPoint* preShutdown = new SentryHookPoint(string("core.pre_shutdown"));
     SentryHookPoint* postLoadPlugins = new SentryHookPoint(string("core.post_load_plugins"));
@@ -192,7 +189,7 @@ void Sentry::_setupHookpoints(){
 }
 
 /* Executes the commands in the given hookpoint */
-void Sentry::_executeCommandsIn(IHookPoint* hp){
+void sentry::Sentry::_executeCommandsIn(IHookPoint* hp){
     map<string, IPluginCommand*> commands = hp->getAttachedPluginCommands();
     map<string, IPluginCommand*>::iterator it = commands.begin();
     vector<string> not_used;
@@ -206,7 +203,7 @@ void Sentry::_executeCommandsIn(IHookPoint* hp){
 }
 
 /* Finds a hookpoint by name */
-IHookPoint* Sentry::findHookPoint(string name){
+IHookPoint* sentry::Sentry::findHookPoint(string name){
     map<string, IHookPoint*>::iterator hookpoint = _hookpoints.find(name);
 
     if( hookpoint == _hookpoints.end() ){
@@ -218,7 +215,7 @@ IHookPoint* Sentry::findHookPoint(string name){
 }
 
 /* Finds a plug-in by name */
-IPlugin* Sentry::findPlugin(string name){
+sentry::IPlugin* sentry::Sentry::findPlugin(string name){
     map<string, IPlugin*>::iterator plugin = _plugins.find(name);
 
     if(plugin == _plugins.end() ){

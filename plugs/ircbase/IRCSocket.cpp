@@ -2,6 +2,8 @@
 #include "Logger.h"
 #include <fcntl.h>
 
+using sentry::Logger;
+
 IRCSocket::IRCSocket(char* host, int port){
     _port = port;
 

@@ -21,10 +21,17 @@
 #include <string>
 #include <vector>
 #include "IPlugin.h"
+#include "IPluginProvider.h"
 #include "IHookPoint.h"
 #include "IPluginCommand.h"
 #include "IRCSocket.h"
 #include "SentryConfig.h"
+
+using sentry::IPlugin;
+using sentry::IPluginProvider;
+using sentry::IHookPoint;
+using sentry::IPluginCommand;
+using sentry::SentryConfig;
 
 using std::string;
 using std::vector;

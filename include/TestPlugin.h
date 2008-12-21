@@ -22,6 +22,11 @@
 #include <vector>
 #include <string>
 
+using sentry::IPlugin;
+using sentry::IPluginProvider;
+using sentry::IHookPoint;
+using sentry::IPluginCommand;
+
 using std::string;
 using std::vector;
 

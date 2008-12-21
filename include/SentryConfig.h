@@ -23,95 +23,99 @@
 #include <map>
 #include <string>
 
+using sentry::SentryConfigSection;
+
 using std::string;
 using std::map;
 using std::ofstream;
 
-/**
- * @brief Class for reading config files.
- * @author $Author$
- * @copyright Copyright (C) 2008 by Coen Bijlsma
- * @since 2008-11-20
- * @changed $Date$
- * @version $Id$
- * @url $HeadURL$
- *
- * This class handles config files for sentry.
- */
-class SentryConfig {
-private:
-        string _filename;
-        map<string, SentryConfigSection*> _sections;
+namespace sentry {
+    /**
+     * @brief Class for reading config files.
+     * @author $Author$
+     * @copyright Copyright (C) 2008 by Coen Bijlsma
+     * @since 2008-11-20
+     * @changed $Date$
+     * @version $Id$
+     * @url $HeadURL$
+     *
+     * This class handles config files for sentry.
+     */
+    class SentryConfig {
+    private:
+            string _filename;
+            map<string, SentryConfigSection*> _sections;
 
-        /*
-         * Tries to read the configfile and fill
-         * the _sections map.
-         * @throws string If the configfile could not
-         * be opened.
-         */
-        void _init() throw(string);
+            /*
+             * Tries to read the configfile and fill
+             * the _sections map.
+             * @throws string If the configfile could not
+             * be opened.
+             */
+            void _init() throw(string);
 
-        /*
-         * Writes the content of _sections[name] to
-         * _fs.
-         * @throws string If the ofstream* is not open.
-         */
-        void _writeSection(ofstream* fs, SentryConfigSection* section) throw(string);
-        
-public:
+            /*
+             * Writes the content of _sections[name] to
+             * _fs.
+             * @throws string If the ofstream* is not open.
+             */
+            void _writeSection(ofstream* fs, SentryConfigSection* section) throw(string);
 
-        /*
-         * Constructor.
-         * Tries to open the provided configfile
-         * and then calls _init() to read its contents.
-         * If the provided configfile does not exist,
-         * this constructor tries the default configfile.
-         * If that doesn's exist either, it tries to write
-         * the default configfile, and _init() with that.
-         * If that also fails, it gives up all hope and
-         * stops.
-         * @throws string If all hope has gone.
-         */
-        SentryConfig(string filename = "sentry.conf") throw(string);
+    public:
 
-        /*
-         * Writes the current config to the configfile, and
-         * cleans up the map of sections, effectively calling
-         * their destructors.
-         */
-        virtual ~SentryConfig() throw();
+            /*
+             * Constructor.
+             * Tries to open the provided configfile
+             * and then calls _init() to read its contents.
+             * If the provided configfile does not exist,
+             * this constructor tries the default configfile.
+             * If that doesn's exist either, it tries to write
+             * the default configfile, and _init() with that.
+             * If that also fails, it gives up all hope and
+             * stops.
+             * @throws string If all hope has gone.
+             */
+            SentryConfig(string filename = "sentry.conf") throw(string);
 
-        /*
-         * Looks for the requested SentryConfigSection.
-         * Returns it if it exists, otherwise returns
-         * a (SentryConfigSection*)0 pointer.
-         */
-        SentryConfigSection* getSection(string name) throw();
+            /*
+             * Writes the current config to the configfile, and
+             * cleans up the map of sections, effectively calling
+             * their destructors.
+             */
+            virtual ~SentryConfig() throw();
 
-        /*
-         * Tries to locate the requested section and setting.
-         * If either doesn't exist, this function returns an
-         * empty string.
-         * Otherwise calls get() on the SentryConfigSection.
-         * @see SentryConfigSection.h
-         */
-        string getValue(string section, string setting) throw();
+            /*
+             * Looks for the requested SentryConfigSection.
+             * Returns it if it exists, otherwise returns
+             * a (SentryConfigSection*)0 pointer.
+             */
+            SentryConfigSection* getSection(string name) throw();
 
-        /*
-         * Sets or creates a setting in the requested section.
-         * Of the section does not exist, an error occurs.
-         * @throws string If the requested section does not
-         * exist.
-         */
-        void setSetting(string section, string setting, string value) throw(string);
+            /*
+             * Tries to locate the requested section and setting.
+             * If either doesn't exist, this function returns an
+             * empty string.
+             * Otherwise calls get() on the SentryConfigSection.
+             * @see SentryConfigSection.h
+             */
+            string getValue(string section, string setting) throw();
 
-        /*
-         * Tries to write the current config to the configfile.
-         * In fact this function always returns true, but I will
-         * to work on that, promise.
-         */
-        bool writeConfig() throw();
+            /*
+             * Sets or creates a setting in the requested section.
+             * Of the section does not exist, an error occurs.
+             * @throws string If the requested section does not
+             * exist.
+             */
+            void setSetting(string section, string setting, string value) throw(string);
 
-};
+            /*
+             * Tries to write the current config to the configfile.
+             * In fact this function always returns true, but I will
+             * to work on that, promise.
+             */
+            bool writeConfig() throw();
+
+    };
+}
 
 #endif /* SENTRYCONFIG_H */

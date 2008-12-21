@@ -22,30 +22,33 @@
 #include "IHookPoint.h"
 #include "IPlugin.h"
 
-class IPlugin;
-class IHookPoint;
-
 using std::string;
 
-/**
- * @brief Interface for the plug-in providing part of Sentry.
- * @author $Author$
- * @copyright Copyright (C) 2008 by Coen Bijlsma
- * @since 2008-12-14
- * @changed $Date$
- * @version $Id$
- * @url $HeadURL$
- */
-class IPluginProvider {
-public:
+namespace sentry {
 
-    virtual ~IPluginProvider(){}
+    class IPlugin;
+    class IHookPoint;
 
-    virtual IHookPoint* findHookPoint(string name) =0;
-    
-    virtual IPlugin* findPlugin(string name) =0;
+    /**
+     * @brief Interface for the plug-in providing part of Sentry.
+     * @author $Author$
+     * @copyright Copyright (C) 2008 by Coen Bijlsma
+     * @since 2008-12-14
+     * @changed $Date$
+     * @version $Id$
+     * @url $HeadURL$
+     */
+    class IPluginProvider {
+    public:
 
-};
+        virtual ~IPluginProvider(){}
+
+        virtual IHookPoint* findHookPoint(string name) =0;
+
+        virtual IPlugin* findPlugin(string name) =0;
+
+    };
+}
 
 #endif	/* _IPLUGINPROVIDER_H */
 

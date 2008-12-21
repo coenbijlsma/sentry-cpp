@@ -8,6 +8,8 @@
 #include "Logger.h"
 #include "EnqueueMessageCommand.h"
 
+using sentry::Logger;
+
 IRCBase::IRCBase(string name) throw(string){
     Logger::setDestination(Logger::DEST_STDOUT);
     Logger::setlogFile("sentry.log");

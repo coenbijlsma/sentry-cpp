@@ -18,23 +18,23 @@
 #include "SentryConfigSection.h"
 #include <iostream>
 
-SentryConfigSection::SentryConfigSection(string name){
+sentry::SentryConfigSection::SentryConfigSection(string name){
     _name = name;
 }
 
-SentryConfigSection::~SentryConfigSection(){
+sentry::SentryConfigSection::~SentryConfigSection(){
     _entries.clear();
 }
 
-string SentryConfigSection::getName(){
+string sentry::SentryConfigSection::getName(){
     return _name;
 }
 
-vector<string> SentryConfigSection::getComment(){
+vector<string> sentry::SentryConfigSection::getComment(){
     return _comment;
 }
 
-void SentryConfigSection::addComment(string comment){
+void sentry::SentryConfigSection::addComment(string comment){
     if(comment.at(0) != '#'){
         string prefix("#");
         prefix += comment;
@@ -44,13 +44,13 @@ void SentryConfigSection::addComment(string comment){
     _comment.push_back(comment);
 }
 
-void SentryConfigSection::addAllComment(vector<string> comment){
+void sentry::SentryConfigSection::addAllComment(vector<string> comment){
     for(vector<string>::iterator it = comment.begin(); it != comment.end(); it++){
         addComment(*it);
     }
 }
 
-string SentryConfigSection::get(string setting){
+string sentry::SentryConfigSection::get(string setting){
     map<string, string>::iterator it = _entries.find(setting);
 
     if(it == _entries.end()){
@@ -59,10 +59,10 @@ string SentryConfigSection::get(string setting){
     return _entries[setting];
 }
 
-void SentryConfigSection::set(string setting, string value){
+void sentry::SentryConfigSection::set(string setting, string value){
     _entries[setting] = value;
 }
 
-map<string, string> SentryConfigSection::all(){
+map<string, string> sentry::SentryConfigSection::all(){
     return _entries;
 }

@@ -25,6 +25,9 @@
 #include <map>
 #include <vector>
 
+using sentry::IPluginCommand;
+using sentry::IHookPoint;
+
 using std::string;
 using std::map;
 using std::vector;

@@ -23,23 +23,25 @@
 using std::exception;
 using std::string;
 
-/**
- * @brief Exception class in case a library doesn't exist.
- * @author $Author$
- * @copyright Copyright (C) 2008 by Coen Bijlsma
- * @since 2008-11-20
- * @changed $Date$
- * @version $Id$
- * @url $HeadURL$
- */
-class NoSuchLibraryException : public exception {
-private:
-    const char* _what;
-    
-public:
-    
-    virtual const char* what() const throw();
-    void setWhat(string what) throw();
-};
+namespace sentry {
+    /**
+     * @brief Exception class in case a library doesn't exist.
+     * @author $Author$
+     * @copyright Copyright (C) 2008 by Coen Bijlsma
+     * @since 2008-11-20
+     * @changed $Date$
+     * @version $Id$
+     * @url $HeadURL$
+     */
+    class NoSuchLibraryException : public exception {
+    private:
+        const char* _what;
+
+    public:
+
+        virtual const char* what() const throw();
+        void setWhat(string what) throw();
+    };
+}
 
 #endif

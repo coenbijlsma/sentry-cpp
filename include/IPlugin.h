@@ -23,73 +23,75 @@
 #include "IPluginCommand.h"
 #include "IPluginProvider.h"
 
-class IHookPoint;
-class IPluginCommand;
-
 using std::string;
 using std::vector;
 
-/**
- * @brief Interface for plug-ins.
- * @author $Author$
- * @copyright Copyright (C) 2008 by Coen Bijlsma
- * @since 2008-11-20
- * @changed $Date$
- * @version $Id$
- * @url $HeadURL$
- *
- * Sentry uses this interface to work with plug-ins.
- * If you want to create your own plug-ins, you have
- * to implement this interface and create a shared library
- * that has to reside in the plug-ins directory of Sentry.
- * Remember to clean up your own IHookpoint*s, because
- * Sentry doesn't to that kind of cleanup for you.
- */
-class IPlugin {
-public:
+namespace sentry {
+    class IHookPoint;
+    class IPluginCommand;
+    
+    /**
+     * @brief Interface for plug-ins.
+     * @author $Author$
+     * @copyright Copyright (C) 2008 by Coen Bijlsma
+     * @since 2008-11-20
+     * @changed $Date$
+     * @version $Id$
+     * @url $HeadURL$
+     *
+     * Sentry uses this interface to work with plug-ins.
+     * If you want to create your own plug-ins, you have
+     * to implement this interface and create a shared library
+     * that has to reside in the plug-ins directory of Sentry.
+     * Remember to clean up your own IHookpoint*s, because
+     * Sentry doesn't to that kind of cleanup for you.
+     */
+    class IPlugin {
+    public:
 
-    /**
-     * Destructor
-     */
-    virtual ~IPlugin(){}
+        /**
+         * Destructor
+         */
+        virtual ~IPlugin(){}
 
-    /**
-     * @brief Sets the provider for this plug-in
-     */
-    virtual void setProvider(IPluginProvider* provider) =0;
-    
-    /**
-     * @brief Returns the name of this plug-in.
-     */
-    virtual string getName() =0;
-    
-    /**
-     * @brief Returns the hookpoints this plug-in provides.
-     */
-    virtual vector<IHookPoint*> getProvidingHookPoints() =0;
-    
-    /**
-     * Returns the names of other plug-ins this plug-in depends on.
-     * Two plug-ins may not have a reference to each other, thus preventing
-     * circular references.
-     * If a plug-in is missing that is required by other plug-ins, those
-     * plug-ins are removed as well, and therefore cannot be used.
-     */
-    virtual vector<string> getDependencies() =0;
-    
-    /**
-     * Returns the commands this plug-in provides.
-     */
-    virtual vector<IPluginCommand*> getCommands() =0;
+        /**
+         * @brief Sets the provider for this plug-in
+         */
+        virtual void setProvider(IPluginProvider* provider) =0;
 
-    /**
-     * Returns the command that has the given name
-     */
-    virtual IPluginCommand* findCommand(string name) =0;
-    
-};
+        /**
+         * @brief Returns the name of this plug-in.
+         */
+        virtual string getName() =0;
 
-typedef IPlugin* create_plugin_t();
-typedef bool destroy_plugin_t(IPlugin* plugin);
+        /**
+         * @brief Returns the hookpoints this plug-in provides.
+         */
+        virtual vector<IHookPoint*> getProvidingHookPoints() =0;
+
+        /**
+         * Returns the names of other plug-ins this plug-in depends on.
+         * Two plug-ins may not have a reference to each other, thus preventing
+         * circular references.
+         * If a plug-in is missing that is required by other plug-ins, those
+         * plug-ins are removed as well, and therefore cannot be used.
+         */
+        virtual vector<string> getDependencies() =0;
+
+        /**
+         * Returns the commands this plug-in provides.
+         */
+        virtual vector<IPluginCommand*> getCommands() =0;
+
+        /**
+         * Returns the command that has the given name
+         */
+        virtual IPluginCommand* findCommand(string name) =0;
+
+    };
+}
+
+typedef sentry::IPlugin* create_plugin_t();
+typedef bool destroy_plugin_t(sentry::IPlugin* plugin);
 
 #endif

@@ -19,6 +19,8 @@
 #include <iostream>
 #include <string>
 
+using sentry::Sentry;
+
 using std::string;
 using std::cout;
 using std::cerr;

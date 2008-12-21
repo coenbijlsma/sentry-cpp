@@ -25,10 +25,10 @@ using std::endl;
 using std::ofstream;
 using std::ios_base;
 
-Logger::log_destination_t Logger::log_destination;
-string Logger::logfile;
+sentry::Logger::log_destination_t sentry::Logger::log_destination;
+string sentry::Logger::logfile;
 
-void Logger::log(string message, log_level_t log_level) throw(){
+void sentry::Logger::log(string message, log_level_t log_level) throw(){
     switch(log_level){
         case LOG_INFO:
             message = string("[INFO] " + message); break;
@@ -67,10 +67,10 @@ void Logger::log(string message, log_level_t log_level) throw(){
     
 }
 
-void Logger::setDestination(log_destination_t dest) throw(){
+void sentry::Logger::setDestination(log_destination_t dest) throw(){
     Logger::log_destination = dest;
 }
 
-void Logger::setlogFile(string filepath) throw(){
+void sentry::Logger::setlogFile(string filepath) throw(){
     Logger::logfile = filepath;
 }

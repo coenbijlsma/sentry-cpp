@@ -8,6 +8,8 @@
 
 #include <iostream>
 
+using sentry::Logger;
+
 using std::cout;
 using std::endl;
 
