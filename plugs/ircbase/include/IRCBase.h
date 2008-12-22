@@ -20,6 +20,7 @@
 
 #include <string>
 #include <vector>
+#include <pthread.h>
 #include "IPlugin.h"
 #include "IPluginProvider.h"
 #include "IHookPoint.h"
@@ -62,6 +63,7 @@ private:
     vector<string> _dependencies;
     vector<IPluginCommand*> _commands;
     vector<string> _messageQueue; // queue of messages to be sent over the socket
+    pthread_t _listener;
     bool _doListen;
     
     IRCSocket* _socket;

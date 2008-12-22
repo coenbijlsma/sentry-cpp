@@ -1,16 +1,17 @@
 
 #include <vector>
 #include <stdlib.h>
-#include <pthread.h>
 
 #include "IRCSocket.h"
 #include "IRCBase.h"
 #include "Logger.h"
 #include "EnqueueMessageCommand.h"
+#include "IRCMessage.h"
 
 using sentry::Logger;
 
 IRCBase::IRCBase(string name) throw(string){
+
     Logger::setDestination(Logger::DEST_STDOUT);
     Logger::setlogFile("sentry.log");
     _name = name;
@@ -24,9 +25,8 @@ IRCBase::IRCBase(string name) throw(string){
 
         /* Setup the thread to listen to incoming data */
         _doListen = false;
-        pthread_t listener;
-        int li = pthread_create(&listener, NULL, IRCBase::_listen, (void*)this );
-        pthread_join(listener, NULL);
+        int li = pthread_create(&_listener, NULL, IRCBase::_listen, (void*)this );
+        pthread_join(_listener, NULL);
     }
 
 }
@@ -81,7 +81,13 @@ void IRCBase::__listen(){
     while(_doListen){
         string message = _socket->readMessage("\r\n");
         if(message.size() > 0){
-            Logger::log(message, Logger::LOG_INFO);
+            IRCMessage ircmessage(message);
+            IRCMessagePrefix* prefix = ircmessage.getPrefix();
+            if(prefix){
+                Logger::log("prefix: " + prefix->toRFCFormat(), Logger::LOG_INFO);
+            }
+            Logger::log("command: " + ircmessage.getCommand(), Logger::LOG_INFO);
+            Logger::log("params: " + ircmessage.getParamsAsString(), Logger::LOG_INFO);
         }
     }
     Logger::log("No longer listening", Logger::LOG_INFO);

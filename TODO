@@ -12,3 +12,5 @@
 * Create a Buffer class to neatly handle network traffic
 * Move the thread creation out of IRCBase::IRCBase(), and chain it 
   to a hookpoint.
+* Implement IRCMessage.h
+* Implement IRCMessagePrefix.h
