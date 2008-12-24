@@ -1,14 +1,17 @@
 #include "IRCMessagePrefix.h"
 #include "StringTokenizer.h"
 
+#include "Logger.h"
+
 using sentry::StringTokenizer;
+
+using sentry::Logger;
 
 char IRCMessagePrefix::PREFIX_START = ':';
 char IRCMessagePrefix::PREFIX_UID = '!';
 char IRCMessagePrefix::PREFIX_HID = '@';
 
 IRCMessagePrefix::IRCMessagePrefix() throw(){
-
 }
 
 IRCMessagePrefix::IRCMessagePrefix(string raw) throw(GenericIRCBaseException){
@@ -19,10 +22,11 @@ IRCMessagePrefix::~IRCMessagePrefix() throw() {}
 
 void IRCMessagePrefix::_init(string raw) throw(GenericIRCBaseException){
     if(raw.size() == 0){
+        Logger::log("Returning because the raw string has size of 0", Logger::LOG_INFO);
         return;
     }
 
-    if(raw[0] != IRCMessagePrefix::PREFIX_START){
+    if(raw.at(0) != IRCMessagePrefix::PREFIX_START){
         GenericIRCBaseException ex("The prefix must start with a colon");
         throw ex;
     }
@@ -54,7 +58,6 @@ void IRCMessagePrefix::_init(string raw) throw(GenericIRCBaseException){
             this->_host = stUserHost.next();
         }
     }
-
 }
 
 void IRCMessagePrefix::setServerOrNick(string son) throw() {
@@ -83,19 +86,19 @@ string IRCMessagePrefix::getHost() throw() {
 
 string IRCMessagePrefix::toRFCFormat() throw() {
     string rfc;
-    if(this->_serverOrNick.size() == 0){
+    if(this->_serverOrNick.empty()){
         return rfc;
     }
 
     rfc.append(1, IRCMessagePrefix::PREFIX_START);
     rfc += this->_serverOrNick;
 
-    if(this->_user.size() != 0){
+    if( ! this->_user.empty()){
         rfc.append(1, IRCMessagePrefix::PREFIX_UID);
         rfc += this->_user;
     }
 
-    if(this->_host.size() != 0){
+    if( ! this->_host.empty()){
         rfc.append(1, IRCMessagePrefix::PREFIX_HID);
         rfc += this->_host;
     }

@@ -25,7 +25,7 @@ IRCBase::IRCBase(string name) throw(string){
 
         /* Setup the thread to listen to incoming data */
         _doListen = false;
-        int li = pthread_create(&_listener, NULL, IRCBase::_listen, (void*)this );
+        int li = pthread_create(&this->_listener, NULL, IRCBase::_listen, (void*)this );
         pthread_join(_listener, NULL);
     }
 
@@ -79,16 +79,22 @@ bool IRCBase::_connect(){
 
 void IRCBase::__listen(){
     while(_doListen){
+
         string message = _socket->readMessage("\r\n");
+        
         if(message.size() > 0){
-            IRCMessage ircmessage(message);
-            IRCMessagePrefix* prefix = ircmessage.getPrefix();
-            if(prefix){
-                Logger::log("prefix: " + prefix->toRFCFormat(), Logger::LOG_INFO);
+            Logger::log(message, Logger::LOG_INFO);
+            /*
+            try{
+                IRCMessage ircmessage(message);
+                Logger::log(ircmessage.toRFCFormat(), Logger::LOG_INFO);
+            }catch(GenericIRCBaseException& ex){
+                Logger::log(ex.what(), Logger::LOG_ERROR);
             }
-            Logger::log("command: " + ircmessage.getCommand(), Logger::LOG_INFO);
-            Logger::log("params: " + ircmessage.getParamsAsString(), Logger::LOG_INFO);
+            */
         }
+         
+        //Logger::log("message: " + message, Logger::LOG_INFO);
     }
     Logger::log("No longer listening", Logger::LOG_INFO);
 }

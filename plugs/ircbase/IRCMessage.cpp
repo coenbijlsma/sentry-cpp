@@ -1,8 +1,12 @@
+
+#include "Logger.h"
+
 #include "IRCMessage.h"
 #include "IRCBase.h"
 #include "StringTokenizer.h"
 
 using sentry::StringTokenizer;
+using sentry::Logger;
 
 IRCMessage::IRCMessage() throw() {
 
@@ -25,12 +29,18 @@ void IRCMessage::_init(string raw) throw(GenericIRCBaseException){
     }
     StringTokenizer st(raw, ' ');
 
-    if(raw.at(0) == IRCMessagePrefix::PREFIX_START){
+    if(raw.at(0) == ':'){
         _prefix = new IRCMessagePrefix(st.next());
+    }else{
+        _prefix = 0;
     }
 
+    if( ! st.hasNext()){
+        GenericIRCBaseException ex(raw + " :: has no command!");
+        throw ex;
+    }
     _command = st.next();
-    
+
     // handle the first param separately
     if(st.hasNext()){
         string firstParam = st.next();
@@ -91,7 +101,7 @@ vector<string> IRCMessage::getParams() throw() {
 string IRCMessage::getParamsAsString() throw() {
     string ret;
 
-    for(int i = 0; i < _params.size(); i++){
+    for(unsigned int i = 0; i < _params.size(); i++){
         ret += (i == 0) ? "" : " ";
         ret += _params.at(i);
     }
