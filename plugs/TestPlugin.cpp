@@ -74,6 +74,10 @@ IPluginCommand* TestPlugin::findCommand(string name){
     return (IPluginCommand*)0;
 }
 
+bool TestPlugin::isActive(){
+    return false;
+}
+
 extern "C" IPlugin* create_plugin(){
     string name("testplugin");
     return (IPlugin*)new TestPlugin(name);

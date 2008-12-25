@@ -54,6 +54,8 @@ public:
     vector<IPluginCommand*> getCommands();
 
     IPluginCommand* findCommand(string name);
+
+    bool isActive();
     
 };
 

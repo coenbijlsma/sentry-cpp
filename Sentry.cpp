@@ -25,6 +25,7 @@
 #include <cstdlib> /* For exit(int) */
 #include <dirent.h> /* For reading the plug-in directory */
 #include <string.h> /* For strcmp */
+#include <unistd.h> /* For usleep */
 
 using std::vector;
 
@@ -152,6 +153,10 @@ void sentry::Sentry::loadPlugins(){
         }
 
     }
+
+    while(this->_haveActivePlugins()){
+        usleep(100000);
+    }
 }
 
 /* Returns the names if the files in the plug-in directory */
@@ -200,6 +205,19 @@ void sentry::Sentry::_executeCommandsIn(IHookPoint* hp){
             command->execute(not_used);
         }
     }
+}
+
+bool sentry::Sentry::_haveActivePlugins(){
+    bool have = false;
+
+    for(map<string, IPlugin*>::iterator it = _plugins.begin(); it != _plugins.end(); it++){
+        IPlugin* plugin = it->second;
+        if(plugin->isActive()){
+            have = true;
+            break;
+        }
+    }
+    return have;
 }
 
 /* Finds a hookpoint by name */

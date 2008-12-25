@@ -88,6 +88,12 @@ namespace sentry {
          */
         virtual IPluginCommand* findCommand(string name) =0;
 
+        /**
+         * Returns wheter this plug-in is currently active.
+         * If no plug-in is active, Sentry shuts down.
+         */
+        virtual bool isActive() =0;
+
     };
 }
 

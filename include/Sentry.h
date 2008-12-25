@@ -96,6 +96,8 @@ namespace sentry {
          */
         void _executeCommandsIn(IHookPoint* hp);
 
+        bool _haveActivePlugins();
+
     public:
         enum exit_code_t {EXIT_NO_CONFIG = 1, EXIT_NO_PLUGIN_DIR};
 

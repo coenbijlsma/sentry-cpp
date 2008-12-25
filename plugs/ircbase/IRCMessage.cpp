@@ -8,6 +8,8 @@
 using sentry::StringTokenizer;
 using sentry::Logger;
 
+string IRCMessage::MESSAGE_SEPARATOR = "\r\n";
+
 IRCMessage::IRCMessage() throw() {
 
 }
@@ -29,7 +31,7 @@ void IRCMessage::_init(string raw) throw(GenericIRCBaseException){
     }
     StringTokenizer st(raw, ' ');
 
-    if(raw.at(0) == ':'){
+    if(raw.at(0) == IRCMessagePrefix::PREFIX_START){
         _prefix = new IRCMessagePrefix(st.next());
     }else{
         _prefix = 0;
@@ -40,15 +42,6 @@ void IRCMessage::_init(string raw) throw(GenericIRCBaseException){
         throw ex;
     }
     _command = st.next();
-
-    // handle the first param separately
-    if(st.hasNext()){
-        string firstParam = st.next();
-        if(firstParam.at(0) == ':'){
-            firstParam = firstParam.substr(1);
-        }
-        this->addParam(firstParam);
-    }
 
     while(st.hasNext()){
         this->addParam(st.next());
@@ -125,6 +118,6 @@ string IRCMessage::toRFCFormat() throw() {
         }
     }
 
-    rfc += "\r\n";
+    rfc += IRCMessage::MESSAGE_SEPARATOR;
     return rfc;
 }

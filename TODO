@@ -9,7 +9,5 @@
 * Enable config files to include and/or extend others
 
 -- IRCBASE --
-* Create a Buffer class to neatly handle network traffic
 * Move the thread creation out of IRCBase::IRCBase(), and chain it 
   to a hookpoint.
-* fix IRCMessage::_init()

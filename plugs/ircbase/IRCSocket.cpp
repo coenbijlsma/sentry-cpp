@@ -39,12 +39,6 @@ bool IRCSocket::createConnection(){
     _br = new BufferedSocketReader(_sockfd, false, 512);
     _bw = new BufferedSocketWriter(_sockfd, 513, 10);
 
-    /* set-up non-blocking socket */
-    /*
-    int flags = fcntl(_sockfd, F_GETFL, 0);
-    flags |= O_NONBLOCK;
-    fcntl(_sockfd, flags, 0);
-    */
     memset(&_addr, 0, sizeof(_addr));
     _addr.sin_family = AF_INET;
     _addr.sin_port = htons(_port);
@@ -119,6 +113,14 @@ bool IRCSocket::sendMessage(string msg){
 
 string IRCSocket::readMessage(string delim){
     string temp_msg;
+
+    /*
+     * Check if the BufferedReader knows that the peer has shutdown the
+     * connection.
+     */
+    if(_br->peerHasShutdown()){
+        this->disconnect();
+    }
     if( ! _connected){
         Logger::log("In IRCSocket::readMessage() Not connected", Logger::LOG_WARNING);
         return temp_msg;

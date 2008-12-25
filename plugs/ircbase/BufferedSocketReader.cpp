@@ -16,6 +16,7 @@ using std::endl;
 BufferedSocketReader::BufferedSocketReader(int fd, bool blocking, int bufsize) : _bufsize(bufsize) {
     _fd = fd;
     _blocking = blocking;
+    _shutdownFlag = false;
 
     if(!_blocking){
         int flags = fcntl(_fd, F_GETFL, 0);
@@ -34,7 +35,7 @@ void BufferedSocketReader::_fillBuffer(){
 
     switch(recv(_fd, newbuf, this->_bufsize, 0)){
         case 0:
-            // shutdown
+            _shutdownFlag = true;
             break;
         case -1:
             // error
@@ -69,7 +70,16 @@ string BufferedSocketReader::read(string delim, bool includeDelim){
     int i;
     
     while( (i = this->read()) != -1){
-        ret.append(1, (char)i);
+        /*
+         * And here we reach the point where we discard all \0 chars.
+         * I actually expected that those wouldn't be sent by the ircds,
+         * but as it turns out they are (I tested with ircd-irc2 on
+         * Ubuntu server amd64 which I know is very old), so we're getting
+         * rid of them over here.
+         */
+        if(i != 0){
+            ret.append(1, (char)i);
+        }
 
         if(ret.length() >= delim.length()){
             if(ret.substr(ret.size() - delim.size()) == delim){
@@ -88,4 +98,8 @@ string BufferedSocketReader::read(string delim, bool includeDelim){
 
 string BufferedSocketReader::readLine(){
     return this->read("\n", false);
+}
+
+bool BufferedSocketReader::peerHasShutdown(){
+    return _shutdownFlag;
 }

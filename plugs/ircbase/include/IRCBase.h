@@ -108,6 +108,8 @@ public:
 
     IPluginCommand* findCommand(string name);
 
+    bool isActive();
+
     /* IRCBase functions */
 
     /**

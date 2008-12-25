@@ -92,6 +92,8 @@ private:
     void _init(string raw) throw(GenericIRCBaseException);
 public:
 
+    static string MESSAGE_SEPARATOR;
+
     /**
      * Constructs an empty message
      */

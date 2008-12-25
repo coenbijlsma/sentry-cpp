@@ -13,20 +13,32 @@ using sentry::Logger;
 IRCBase::IRCBase(string name) throw(string){
 
     Logger::setDestination(Logger::DEST_STDOUT);
-    Logger::setlogFile("sentry.log");
+
     _name = name;
     _config = new SentryConfig("./ircbase.conf");
     _setupCommands();
     if(_connect()){
-        _socket->sendMessage("PASS foo\r\n");
-        _socket->sendMessage("NICK sentry`\r\n");
-        _socket->sendMessage("USER Sentry` foo bar Sentry`\r\n");
-        _socket->sendMessage("JOIN " + _config->getValue("connection", "channel") + "\r\n");
+        
+        _socket->sendMessage("PASS " 
+            + _config->getValue("connection", "password")
+            + IRCMessage::MESSAGE_SEPARATOR);
+        _socket->sendMessage("NICK " 
+            + _config->getValue("connection", "nick")
+            + IRCMessage::MESSAGE_SEPARATOR);
+        _socket->sendMessage("USER " 
+            + _config->getValue("connection", "name")
+            + " foo bar "
+            + _config->getValue("connection", "realname")
+            + IRCMessage::MESSAGE_SEPARATOR);
+        _socket->sendMessage("JOIN "
+            + _config->getValue("connection", "channel")
+            + IRCMessage::MESSAGE_SEPARATOR);
 
         /* Setup the thread to listen to incoming data */
         _doListen = false;
         int li = pthread_create(&this->_listener, NULL, IRCBase::_listen, (void*)this );
-        pthread_join(_listener, NULL);
+        //pthread_join(_listener, NULL);
+        pthread_detach(_listener);
     }
 
 }
@@ -80,21 +92,23 @@ bool IRCBase::_connect(){
 void IRCBase::__listen(){
     while(_doListen){
 
-        string message = _socket->readMessage("\r\n");
+        /* Skip the read if the socket is disconnected */
+        if( ! _socket->connected()){
+            _doListen = false;
+            continue;
+        }
+        
+        string message = _socket->readMessage(IRCMessage::MESSAGE_SEPARATOR);
         
         if(message.size() > 0){
-            Logger::log(message, Logger::LOG_INFO);
-            /*
             try{
                 IRCMessage ircmessage(message);
                 Logger::log(ircmessage.toRFCFormat(), Logger::LOG_INFO);
             }catch(GenericIRCBaseException& ex){
                 Logger::log(ex.what(), Logger::LOG_ERROR);
             }
-            */
         }
          
-        //Logger::log("message: " + message, Logger::LOG_INFO);
     }
     Logger::log("No longer listening", Logger::LOG_INFO);
 }
@@ -134,6 +148,10 @@ IPluginCommand* IRCBase::findCommand(string name){
         }
     }
     return (IPluginCommand*)0;
+}
+
+bool IRCBase::isActive(){
+    return _doListen;
 }
 
 void IRCBase::enqueue(string message){

@@ -43,6 +43,7 @@ private:
     int _fd;
     bool _blocking;
     vector<char> _buffer;
+    bool _shutdownFlag;
     
     void _fillBuffer();
     
@@ -86,6 +87,13 @@ public:
      *@return string The line.
      */
     string readLine();
+
+    /**
+     * Returns whether the peer has performed an orderly shutdown
+     * (I.E.recv() returned 0).
+     * @return bool Whether the peer has shutdown the connection.
+     */
+    bool peerHasShutdown();
 
 };
 
