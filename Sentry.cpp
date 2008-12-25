@@ -145,18 +145,9 @@ void sentry::Sentry::loadPlugins(){
             Logger::log(nsse.what(), Logger::LOG_ERROR);
 	}
 
-        IHookPoint* post_load_plugins = findHookPoint("core.post_load_plugins");
-        if(post_load_plugins == 0){
-            Logger::log("Could not find hookpoint core.post_load_plugins", Logger::LOG_ERROR);
-        }else{
-            _executeCommandsIn(post_load_plugins);
-        }
-
     }
 
-    while(this->_haveActivePlugins()){
-        usleep(100000);
-    }
+    this->_activatePlugins();
 }
 
 /* Returns the names if the files in the plug-in directory */
@@ -218,6 +209,30 @@ bool sentry::Sentry::_haveActivePlugins(){
         }
     }
     return have;
+}
+
+void sentry::Sentry::_activatePlugins(){
+
+    // activate all the plug-ins
+    for(map<string, IPlugin*>::iterator it = _plugins.begin(); it != _plugins.end(); it++){
+        IPlugin* plugin = it->second;
+        if( ! plugin->activate()){
+            Logger::log("Could not activate plug-in " + plugin->getName(), Logger::LOG_WARNING);
+        }
+    }
+
+    IHookPoint* post_load_plugins = findHookPoint("core.post_load_plugins");
+    if(post_load_plugins == 0){
+        Logger::log("Could not find hookpoint core.post_load_plugins", Logger::LOG_ERROR);
+    }else{
+        _executeCommandsIn(post_load_plugins);
+    }
+
+    while(this->_haveActivePlugins()){
+        usleep(100000);
+    }
+
+    Logger::log("No more active plug-ins, shutting down.", Logger::LOG_INFO);
 }
 
 /* Finds a hookpoint by name */

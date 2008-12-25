@@ -1,12 +1,15 @@
 
 #include <vector>
 #include <stdlib.h>
+#include <unistd.h> /* For usleep */
 
 #include "IRCSocket.h"
 #include "IRCBase.h"
+#include "IRCBaseHookPoint.h"
 #include "Logger.h"
 #include "EnqueueMessageCommand.h"
 #include "IRCMessage.h"
+#include "IPluginCommand.h"
 
 using sentry::Logger;
 
@@ -16,31 +19,17 @@ IRCBase::IRCBase(string name) throw(string){
 
     _name = name;
     _config = new SentryConfig("./ircbase.conf");
-    _setupCommands();
-    if(_connect()){
-        
-        _socket->sendMessage("PASS " 
-            + _config->getValue("connection", "password")
-            + IRCMessage::MESSAGE_SEPARATOR);
-        _socket->sendMessage("NICK " 
-            + _config->getValue("connection", "nick")
-            + IRCMessage::MESSAGE_SEPARATOR);
-        _socket->sendMessage("USER " 
-            + _config->getValue("connection", "name")
-            + " foo bar "
-            + _config->getValue("connection", "realname")
-            + IRCMessage::MESSAGE_SEPARATOR);
-        _socket->sendMessage("JOIN "
-            + _config->getValue("connection", "channel")
-            + IRCMessage::MESSAGE_SEPARATOR);
 
-        /* Setup the thread to listen to incoming data */
-        _doListen = false;
-        int li = pthread_create(&this->_listener, NULL, IRCBase::_listen, (void*)this );
-        //pthread_join(_listener, NULL);
-        pthread_detach(_listener);
+    string logdestination = _config->getValue("log", "destination");
+    if(logdestination == "file"){
+        Logger::setDestination(Logger::DEST_FILE);
+        Logger::setlogFile(_config->getValue("log", "filename"));
+    }else if(logdestination == "database"){
+        Logger::setDestination(Logger::DEST_DATABASE);
     }
-
+    
+    _setupCommands();
+    _setupHookpoints();
 }
 
 IRCBase::~IRCBase(){
@@ -61,14 +50,159 @@ IRCBase::~IRCBase(){
     }
 }
 
+void* IRCBase::__listen(void* ptr){
+    IRCBase* ircbase = (IRCBase*)ptr;
+    ircbase->_doListen = true;
+    ircbase->_listen();
+    return 0;
+}
+
+void* IRCBase::__queueListen(void* ptr){
+    IRCBase* ircbase = (IRCBase*)ptr;
+    ircbase->_queueListen();
+    return 0;
+}
+
+void IRCBase::_listen(){
+    while(_doListen){
+
+        /* Skip the read if the socket is disconnected */
+        if( ! _socket->connected()){
+            _doListen = false;
+            continue;
+        }
+
+        string message = _socket->readMessage(IRCMessage::MESSAGE_SEPARATOR);
+
+        if(message.size() > 0){
+            // execute the IPluginCommands attached to the post_receive hookpoint
+            IHookPoint* post_receive = _findHookPoint("ircbase.post_receive");
+
+            if(post_receive){
+                Logger::log(message, Logger::LOG_INFO);
+                map<string, IPluginCommand*> commands = post_receive->getAttachedPluginCommands();
+                vector<string> params;
+                params.push_back(message);
+
+                for(map<string, IPluginCommand*>::iterator it = commands.begin(); it != commands.end(); it++){
+                    IPluginCommand* command = it->second;
+                    command->execute(params);
+                }
+            }
+        }
+
+    }
+    Logger::log("No longer listening", Logger::LOG_INFO);
+}
+
+void IRCBase::_queueListen(){
+    while(_doListen){
+        if( ! _socket->connected() ){
+            continue;
+        }
+
+        while( ! _messageQueue.empty()){
+            string message = *(_messageQueue.begin());
+            if(_socket->sendMessage(message)){
+                _messageQueue.erase(_messageQueue.begin());
+            }
+        }
+
+        usleep(100000);
+    }
+}
+
+/* create the socket-listener thread */
+void IRCBase::_createListenerThread(){
+        switch(pthread_create(&this->_listener, NULL, IRCBase::__listen, (void*)this )){
+            case 0:
+                switch(pthread_detach(_listener)){
+                    case 0:
+                        break;
+                    case EINVAL:
+                        Logger::log("Provided thread does not refer to a joinable thread"
+                            , Logger::LOG_ERROR);
+                        _doListen = false;
+                        break;
+                    case ESRCH:
+                        Logger::log("Thread with specified ID could not be found"
+                            , Logger::LOG_ERROR);
+                        _doListen = false;
+                        break;
+                }
+                break;
+            case EAGAIN:
+                Logger::log("Could not create new thread due to a lack of resources, of the maximum amount of threads has been reached."
+                    , Logger::LOG_ERROR);
+                _doListen = false;
+                break;
+            case EINVAL:
+                Logger::log("Invalid attribute(2) while creating thread"
+                    , Logger::LOG_ERROR);
+                _doListen = false;
+                break;
+            case EPERM:
+                Logger::log("Insufficient permissions to set scheduling parameters or scheduling policy."
+                    , Logger::LOG_ERROR);
+                _doListen = false;
+                break;
+        }
+}
+
+/* create the messagequeue-listener thread */
+void IRCBase::_createQueueListenerThread(){
+        switch(pthread_create(&this->_queueListener, NULL, IRCBase::__queueListen, (void*)this )){
+            case 0:
+                switch(pthread_detach(_queueListener)){
+                    case 0:
+                        break;
+                    case EINVAL:
+                        Logger::log("Provided thread does not refer to a joinable thread"
+                            , Logger::LOG_ERROR);
+                        _doListen = false;
+                        break;
+                    case ESRCH:
+                        Logger::log("Thread with specified ID could not be found"
+                            , Logger::LOG_ERROR);
+                        _doListen = false;
+                        break;
+                }
+                break;
+            case EAGAIN:
+                Logger::log("Could not create new thread due to a lack of resources, of the maximum amount of threads has been reached."
+                    , Logger::LOG_ERROR);
+                _doListen = false;
+                break;
+            case EINVAL:
+                Logger::log("Invalid attribute(2) while creating thread"
+                    , Logger::LOG_ERROR);
+                _doListen = false;
+                break;
+            case EPERM:
+                Logger::log("Insufficient permissions to set scheduling parameters or scheduling policy."
+                    , Logger::LOG_ERROR);
+                _doListen = false;
+                break;
+        }
+}
+
+/* Setup the commands this plug-in provides */
 void IRCBase::_setupCommands(){
     IPluginCommand* enqueue_message = new EnqueueMessageCommand(this);
 
-    // do stuff
+    // do stuff ??
 
     _commands.push_back(enqueue_message);
 }
 
+/* Setup the hookpoints this plug-in provides */
+void IRCBase::_setupHookpoints(){
+    IHookPoint* post_receive = new IRCBaseHookPoint("ircbase.post_receive");
+
+    _providingHookPoints.push_back(post_receive);
+}
+
+/* Connects to the server with the provided data of the configfile */
 bool IRCBase::_connect(){
     if(_socket == 0){
         try{
@@ -89,35 +223,16 @@ bool IRCBase::_connect(){
     return true;
 }
 
-void IRCBase::__listen(){
-    while(_doListen){
-
-        /* Skip the read if the socket is disconnected */
-        if( ! _socket->connected()){
-            _doListen = false;
-            continue;
+/* Finds a hookpoint by name */
+IHookPoint* IRCBase::_findHookPoint(string name){
+    for(vector<IHookPoint*>::iterator it = _providingHookPoints.begin(); it != _providingHookPoints.end(); it++){
+        IHookPoint* hookpoint = *it;
+        if(hookpoint->getName() == name){
+            return hookpoint;
         }
-        
-        string message = _socket->readMessage(IRCMessage::MESSAGE_SEPARATOR);
-        
-        if(message.size() > 0){
-            try{
-                IRCMessage ircmessage(message);
-                Logger::log(ircmessage.toRFCFormat(), Logger::LOG_INFO);
-            }catch(GenericIRCBaseException& ex){
-                Logger::log(ex.what(), Logger::LOG_ERROR);
-            }
-        }
-         
     }
-    Logger::log("No longer listening", Logger::LOG_INFO);
-}
 
-void* IRCBase::_listen(void* ptr){
-    IRCBase* ircbase = (IRCBase*)ptr;
-    ircbase->_doListen = true;
-    ircbase->__listen();
-    return 0;
+    return (IHookPoint*)0;
 }
 
 void IRCBase::setProvider(IPluginProvider* provider){
@@ -152,6 +267,34 @@ IPluginCommand* IRCBase::findCommand(string name){
 
 bool IRCBase::isActive(){
     return _doListen;
+}
+
+bool IRCBase::activate(){
+    if(_connect()){
+
+        /* Enqueue the messages to register sentry */
+        this->enqueue("PASS "
+            + _config->getValue("connection", "password")
+            + IRCMessage::MESSAGE_SEPARATOR);
+        this->enqueue("NICK "
+            + _config->getValue("connection", "nick")
+            + IRCMessage::MESSAGE_SEPARATOR);
+        this->enqueue("USER "
+            + _config->getValue("connection", "name")
+            + " foo bar "
+            + _config->getValue("connection", "realname")
+            + IRCMessage::MESSAGE_SEPARATOR);
+        this->enqueue("JOIN "
+            + _config->getValue("connection", "channel")
+            + IRCMessage::MESSAGE_SEPARATOR);
+
+        /* Setup the threads */
+        _doListen = false;
+        this->_createListenerThread();
+        this->_createQueueListenerThread();
+        return true;
+    }
+    return false;
 }
 
 void IRCBase::enqueue(string message){

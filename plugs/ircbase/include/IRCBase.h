@@ -57,20 +57,68 @@ using std::vector;
 class IRCBase : public IPlugin {
 private:
 
+    /*--------------------------------------------------------------------------
+     *                          PRIVATE VARIABLES
+     -------------------------------------------------------------------------*/
+
     IPluginProvider* _provider;
     string _name;
     vector<IHookPoint*> _providingHookPoints;
     vector<string> _dependencies;
     vector<IPluginCommand*> _commands;
     vector<string> _messageQueue; // queue of messages to be sent over the socket
-    pthread_t _listener;
+    pthread_t _listener; // listens for new messages on the socket
+    pthread_t _queueListener; // looks if there is anything in the messagequeue and sends it to the socket
     bool _doListen;
     
     IRCSocket* _socket;
 
     SentryConfig* _config;
 
+    /*--------------------------------------------------------------------------
+     *                          PRIVATE METHODS
+     -------------------------------------------------------------------------*/
+
+    /**
+     * Starts the thread that listens to incoming messages on the socket
+     */
+    static void* __listen(void* ptr);
+
+    /**
+     * Starts the thread that looks in the _messageQueue for messages to be
+     * sent.
+     */
+    static void* __queueListen(void* ptr);
+
+     /**
+     * Does the actual listening for new messages on the socket
+     */
+    void _listen();
+
+    /**
+     * Does the actual looking in the _messageQueue
+     */
+    void _queueListen();
+
+    /**
+     * Creates the thread that listens for incoming messages
+     */
+    void _createListenerThread();
+
+    /**
+     * Creates the thread that listens for outgoing messages
+     */
+    void _createQueueListenerThread();
+
+    /**
+     * Creates the commands that this plug-in provides
+     */
     void _setupCommands();
+
+    /**
+     * Creates the hookpoints that are available in this plug-in
+     */
+    void _setupHookpoints();
 
     /*
      * Connects to the server specified in the config file of thie plug-in,
@@ -79,41 +127,84 @@ private:
     bool _connect();
 
     /**
-     * Does the actual listening
+     * Finds a hookpoint by name
      */
-    void __listen();
-
-    /**
-     * 
-     */
-    static void* _listen(void* ptr);
+    IHookPoint* _findHookPoint(string name);
     
 public:
 
-    IRCBase(string name) throw(string);
-
-    virtual ~IRCBase();
-
-    /* IPlugin functions */
-    
-    void setProvider(IPluginProvider* provider);
-    
-    string getName();
-
-    vector<IHookPoint*> getProvidingHookPoints();
-
-    vector<string> getDependencies();
-
-    vector<IPluginCommand*> getCommands();
-
-    IPluginCommand* findCommand(string name);
-
-    bool isActive();
-
-    /* IRCBase functions */
+    /*--------------------------------------------------------------------------
+     *                          PUBLIC METHODS
+     -------------------------------------------------------------------------*/
 
     /**
-     * Enqueues the given string to send it later on.
+     * Constructor
+     * @param string name The name of the plugin
+     * @throws string If the config file ircbase.conf is not found.
+     */
+    IRCBase(string name) throw(string);
+
+    /**
+     * Destructor.
+     * Also cleans up the hookpoints and commands this plug-in provides.
+     */
+    virtual ~IRCBase();
+
+    /**
+     * Sets the plug-in provider.
+     * @param IPluginProvider* The plug-in provider.
+     */
+    void setProvider(IPluginProvider* provider);
+
+    /**
+     * @return string The name of this plug-in
+     */
+    string getName();
+
+    /**
+     * Returns the hookpoints this plug-in provides., currently being only
+     * ircbase.post_receive.
+     * @return vector<IHookPoint*> The hookpoints.
+     */
+    vector<IHookPoint*> getProvidingHookPoints();
+
+    /**
+     * Returns the names of the plug-ins this plug-in depends on.
+     * @return vector<string> The dependencies.
+     */
+    vector<string> getDependencies();
+
+    /**
+     * Returns the commands this plug-in provides, currently being only
+     * ircbase.enqueue_message.
+     * @return vector<IPluginCommand*> The commands.
+     * @see EnqueueMessageCommand.h
+     */
+    vector<IPluginCommand*> getCommands();
+
+    /**
+     * Finds a IPluginCommand by name.
+     * @param string name The name of the command.
+     * @return IPluginCommand* The found command, or (IPluginCommand*)0 of the
+     * command is not found.
+     */
+    IPluginCommand* findCommand(string name);
+
+    /**
+     * @return bool Whether this plug-in is currently active.
+     */
+    bool isActive();
+
+    /**
+     * Activates the plug-in. This effectively connects to the specified server,
+     * and starts the listening threads.
+     */
+    bool activate();
+
+    /**
+     * Enqueues the given string to send it later on. This function is actually
+     * called by the EnqueueMessageCommand when it is executed.
+     * @param string The message in RFC 1459 format to be enqueued.
      */
     void enqueue(string message);
 

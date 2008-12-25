@@ -56,7 +56,8 @@ public:
     IPluginCommand* findCommand(string name);
 
     bool isActive();
-    
+
+    bool activate();
 };
 
 //typedef IPlugin* create_plugin_t();

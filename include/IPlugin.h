@@ -94,6 +94,12 @@ namespace sentry {
          */
         virtual bool isActive() =0;
 
+        /**
+         * Changes the state of the plug-in to active. From this point on, the
+         * plug-in can start it's work, whatever that is.
+         */
+        virtual bool activate() =0;
+
     };
 }
 

@@ -78,6 +78,10 @@ bool TestPlugin::isActive(){
     return false;
 }
 
+bool TestPlugin::activate(){
+    return true;
+}
+
 extern "C" IPlugin* create_plugin(){
     string name("testplugin");
     return (IPlugin*)new TestPlugin(name);

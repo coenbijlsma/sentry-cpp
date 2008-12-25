@@ -1,13 +1,19 @@
 -- SENTRY --
 * Revise the code to use initialization lists where possible
 * Make SentryConfig and SentryConfigSection not such a syntax bitch
-* Create irc-base plug-in
 * Improve overall Makefile quality
 * Logger::log(...) should not be static
 * Logger has to be extended into a number of subclasses, each with their
   own target (stdout/stderr, file, db, ..)
 * Enable config files to include and/or extend others
+* See where Logger::log can be replaced by an exception
+* Replace throw(string) by a decent exception
 
 -- IRCBASE --
 * Move the thread creation out of IRCBase::IRCBase(), and chain it 
   to a hookpoint.
+* Create HookPoints
+* Create some kind of ThreadDispatcher to make the code more readable 
+
+-- MYSQL --
+* Create it

@@ -96,7 +96,18 @@ namespace sentry {
          */
         void _executeCommandsIn(IHookPoint* hp);
 
+        /**
+         * @return bool Whether there are any active plug-ins.
+         * If there are no active plug-ins, Sentry shuts down.
+         */
         bool _haveActivePlugins();
+
+        /**
+         * Is called by Sentry::loadPlugins() after all the plug-ins have
+         * successfully been loaded. From this point on, the plug-ins are
+         * allowed to start their activities.
+         */
+        void _activatePlugins();
 
     public:
         enum exit_code_t {EXIT_NO_CONFIG = 1, EXIT_NO_PLUGIN_DIR};
