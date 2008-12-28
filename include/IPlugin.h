@@ -44,7 +44,7 @@ namespace sentry {
      * to implement this interface and create a shared library
      * that has to reside in the plug-ins directory of Sentry.
      * Remember to clean up your own IHookpoint*s, because
-     * Sentry doesn't to that kind of cleanup for you.
+     * Sentry doesn't do that kind of cleanup for you.
      */
     class IPlugin {
     public:

@@ -21,6 +21,8 @@
 #include <string>
 #include <vector>
 #include <pthread.h>
+
+#include <Thread.h>
 #include "IPlugin.h"
 #include "IPluginProvider.h"
 #include "IHookPoint.h"
@@ -28,11 +30,16 @@
 #include "IRCSocket.h"
 #include "SentryConfig.h"
 
+#include "IRCSocketListener.h"
+
 using sentry::IPlugin;
 using sentry::IPluginProvider;
 using sentry::IHookPoint;
 using sentry::IPluginCommand;
 using sentry::SentryConfig;
+
+using libthread::Thread;
+using libthread::Runnable;
 
 using std::string;
 using std::vector;
@@ -61,13 +68,14 @@ private:
      *                          PRIVATE VARIABLES
      -------------------------------------------------------------------------*/
 
+    IRCSocketListener* _socketListener;
     IPluginProvider* _provider;
     string _name;
     vector<IHookPoint*> _providingHookPoints;
     vector<string> _dependencies;
     vector<IPluginCommand*> _commands;
     vector<string> _messageQueue; // queue of messages to be sent over the socket
-    pthread_t _listener; // listens for new messages on the socket
+    Thread* _listener; // listens for new messages on the socket
     pthread_t _queueListener; // looks if there is anything in the messagequeue and sends it to the socket
     bool _doListen;
     
@@ -80,20 +88,10 @@ private:
      -------------------------------------------------------------------------*/
 
     /**
-     * Starts the thread that listens to incoming messages on the socket
-     */
-    static void* __listen(void* ptr);
-
-    /**
      * Starts the thread that looks in the _messageQueue for messages to be
      * sent.
      */
     static void* __queueListen(void* ptr);
-
-     /**
-     * Does the actual listening for new messages on the socket
-     */
-    void _listen();
 
     /**
      * Does the actual looking in the _messageQueue

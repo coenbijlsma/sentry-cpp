@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <unistd.h> /* For usleep */
 
+#include <Runnable.h>
+#include <ThreadException.h>
+#include "IRCSocketListener.h"
+
 #include "IRCSocket.h"
 #include "IRCBase.h"
 #include "IRCBaseHookPoint.h"
@@ -12,6 +16,9 @@
 #include "IPluginCommand.h"
 
 using sentry::Logger;
+
+using libthread::Runnable;
+using libthread::ThreadException;
 
 IRCBase::IRCBase(string name) throw(string){
 
@@ -44,60 +51,31 @@ IRCBase::~IRCBase(){
         delete *it;
     }
 
+    if(_socketListener){
+        delete _socketListener;
+    }
+
+    if(_listener){
+        delete _listener;
+    }
+
     if(_socket){
         Logger::log("Deleting socket", Logger::LOG_INFO);
         delete _socket;
     }
 }
 
-void* IRCBase::__listen(void* ptr){
-    IRCBase* ircbase = (IRCBase*)ptr;
-    ircbase->_doListen = true;
-    ircbase->_listen();
-    return 0;
-}
-
 void* IRCBase::__queueListen(void* ptr){
     IRCBase* ircbase = (IRCBase*)ptr;
+    ircbase->_doListen = true;
     ircbase->_queueListen();
     return 0;
-}
-
-void IRCBase::_listen(){
-    while(_doListen){
-
-        /* Skip the read if the socket is disconnected */
-        if( ! _socket->connected()){
-            _doListen = false;
-            continue;
-        }
-
-        string message = _socket->readMessage(IRCMessage::MESSAGE_SEPARATOR);
-
-        if(message.size() > 0){
-            // execute the IPluginCommands attached to the post_receive hookpoint
-            IHookPoint* post_receive = _findHookPoint("ircbase.post_receive");
-
-            if(post_receive){
-                Logger::log(message, Logger::LOG_INFO);
-                map<string, IPluginCommand*> commands = post_receive->getAttachedPluginCommands();
-                vector<string> params;
-                params.push_back(message);
-
-                for(map<string, IPluginCommand*>::iterator it = commands.begin(); it != commands.end(); it++){
-                    IPluginCommand* command = it->second;
-                    command->execute(params);
-                }
-            }
-        }
-
-    }
-    Logger::log("No longer listening", Logger::LOG_INFO);
 }
 
 void IRCBase::_queueListen(){
     while(_doListen){
         if( ! _socket->connected() ){
+            _doListen = false;
             continue;
         }
 
@@ -114,39 +92,18 @@ void IRCBase::_queueListen(){
 
 /* create the socket-listener thread */
 void IRCBase::_createListenerThread(){
-        switch(pthread_create(&this->_listener, NULL, IRCBase::__listen, (void*)this )){
-            case 0:
-                switch(pthread_detach(_listener)){
-                    case 0:
-                        break;
-                    case EINVAL:
-                        Logger::log("Provided thread does not refer to a joinable thread"
-                            , Logger::LOG_ERROR);
-                        _doListen = false;
-                        break;
-                    case ESRCH:
-                        Logger::log("Thread with specified ID could not be found"
-                            , Logger::LOG_ERROR);
-                        _doListen = false;
-                        break;
-                }
-                break;
-            case EAGAIN:
-                Logger::log("Could not create new thread due to a lack of resources, of the maximum amount of threads has been reached."
-                    , Logger::LOG_ERROR);
-                _doListen = false;
-                break;
-            case EINVAL:
-                Logger::log("Invalid attribute(2) while creating thread"
-                    , Logger::LOG_ERROR);
-                _doListen = false;
-                break;
-            case EPERM:
-                Logger::log("Insufficient permissions to set scheduling parameters or scheduling policy."
-                    , Logger::LOG_ERROR);
-                _doListen = false;
-                break;
-        }
+
+    _socketListener = new IRCSocketListener(this->_socket, this->_findHookPoint("ircbase.post_receive"));
+    try{
+        _listener = new Thread(_socketListener);
+        _listener->start();
+        Logger::log("Started thread", Logger::LOG_INFO);
+        _listener->detach();
+        Logger::log("Thread detached", Logger::LOG_INFO);
+    }catch(ThreadException ex){
+        Logger::log(ex.what(), Logger::LOG_ERROR);
+    }
+
 }
 
 /* create the messagequeue-listener thread */

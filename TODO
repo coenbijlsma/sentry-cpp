@@ -13,7 +13,11 @@
 * Move the thread creation out of IRCBase::IRCBase(), and chain it 
   to a hookpoint.
 * Create HookPoints
-* Create some kind of ThreadDispatcher to make the code more readable 
+* Create some kind of ThreadDispatcher to make the code more readable
+* Replace the __queueListen-like functions by a new class QueueListener
 
 -- MYSQL --
 * Create it
+
+-- SIMPLEPLUGIN --
+* Create it (simple plug-ins from config like files)
