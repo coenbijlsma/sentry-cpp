@@ -10,6 +10,8 @@
 * Replace throw(string) by a decent exception
 
 -- IRCBASE --
+* Implement a command identifier ( maybe static # at first? )
+* Implement a #reload command that reloads the config.
 
 -- MYSQL --
 * Create it

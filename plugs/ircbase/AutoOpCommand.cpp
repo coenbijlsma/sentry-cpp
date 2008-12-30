@@ -52,7 +52,10 @@ void AutoOpCommand::execute(vector<string> params){
     bool userPresent = false;
     bool channelPresent = false;
 
-    if(params.size() != 4){ return; }
+    if(params.size() != 4){
+        Logger::log("AutoOpCommand::execute() -- Wrong parameter count (need 4)", Logger::LOG_WARNING);
+        return;
+    }
 
     SentryConfigSection* section = this->_config->getSection("auto_op");
 
@@ -68,8 +71,7 @@ void AutoOpCommand::execute(vector<string> params){
 
         while(st.hasNext()){
             string next = st.next();
-            Logger::log("Comparing " + next + " to " + userhost, Logger::LOG_INFO);
-            if(next == userhost){
+            if(userhost == next){
                 userPresent = true; break;
             }
         }
@@ -82,7 +84,6 @@ void AutoOpCommand::execute(vector<string> params){
 
                 while(cst.hasNext()){
                     string next = cst.next();
-                    Logger::log("Comparing " + next + " to " + channel, Logger::LOG_INFO);
                     if(channel == next){
                         channelPresent = true; break;
                     }

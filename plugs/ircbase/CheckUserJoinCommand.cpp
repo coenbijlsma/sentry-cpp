@@ -55,10 +55,16 @@ void CheckUserJoinCommand::execute(vector<string> params){
     try{
         IRCMessage ircmessage(message);
         if(ircmessage.getCommand() == CheckUserJoinCommand::_JOIN_COMMAND){
-            if( ! ircmessage.getPrefix()){ return; }
+            if( ! ircmessage.getPrefix()){
+                Logger::log("CheckUserJoinCommand::execute -- missing message prefix", Logger::LOG_INFO);
+                return;
+            }
 
             vector<string> msgparams = ircmessage.getParams();
-            if(msgparams.size() == 0){ return; }
+            if(msgparams.size() == 0){
+                Logger::log("CheckUserJoinCommand::execute -- missing parameters in message", Logger::LOG_WARNING);
+                return;
+            }
 
             string channel(msgparams.at(0));
             if(channel.at(0) == ':'){
@@ -82,13 +88,12 @@ void CheckUserJoinCommand::execute(vector<string> params){
 
                 for(map<string, IPluginCommand*>::iterator it = commands.begin(); it != commands.end(); it++){
                     IPluginCommand* command = it->second;
-                    Logger::log("Executing " + command->getName(), Logger::LOG_INFO);
                     command->execute(post_join_user_params);
                 }
             }
             //_plugin->enqueue("MODE " + channel + " +o " + ircmessage.getPrefix()->getServerOrNick() + IRCMessage::MESSAGE_SEPARATOR);
         }
     }catch(GenericIRCBaseException ex){
-        Logger::log(ex.what(), Logger::LOG_WARNING);
+        Logger::log("CheckUserJoinCommand::execute -- GenericIRCBaseException -- " + string(ex.what()), Logger::LOG_WARNING);
     }
 }

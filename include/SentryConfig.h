@@ -63,6 +63,10 @@ namespace sentry {
              */
             void _writeSection(ofstream* fs, SentryConfigSection* section) throw(string);
 
+            void _writeAndEmpty() throw();
+
+            void _loadAndInit(string filename) throw();
+
             /*
              * Below are variables to support some basic include functionality.
              * To let it all work nicely, there are a few rules you have to OBEY
@@ -162,6 +166,11 @@ namespace sentry {
              * to work on that, promise.
              */
             bool writeConfig() throw();
+
+            /**
+             * Reads the config file(s) again.
+             */
+            void reload() throw();
 
             /**
              * Returns whether the given config is already loading.

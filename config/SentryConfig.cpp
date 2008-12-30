@@ -32,6 +32,30 @@ vector<string> sentry::SentryConfig::_loadingConfigs;
 string sentry::SentryConfig::_INCLUDE_DIRECTIVE("!include");
 
 sentry::SentryConfig::SentryConfig(string filename) throw(string){
+    this->_loadAndInit(filename);
+}
+
+sentry::SentryConfig::~SentryConfig() throw(){
+    this->_writeAndEmpty();
+}
+
+void sentry::SentryConfig::_writeAndEmpty() throw() {
+    writeConfig();
+
+    while( ! _sections.empty() ){
+        SentryConfigSection* section = (_sections.begin())->second;
+        _sections.erase(_sections.begin());
+        delete section;
+    }
+
+    while( ! _includedConfigs.empty() ){
+        SentryConfig* config = *(_includedConfigs.begin());
+        _includedConfigs.erase(_includedConfigs.begin());
+        delete config;
+    }
+}
+
+void sentry::SentryConfig::_loadAndInit(string filename) throw() {
     char* rpath = realpath(filename.c_str(), NULL);
     if(rpath){
         string path(rpath);
@@ -58,23 +82,6 @@ sentry::SentryConfig::SentryConfig(string filename) throw(string){
         SentryConfig::_removeLoadingConfig(path);
     }else{
         throw string("Error while looking up the realpath for " + filename);
-    }
-    
-}
-
-sentry::SentryConfig::~SentryConfig() throw(){
-    writeConfig();
-
-    while( ! _sections.empty() ){
-        SentryConfigSection* section = (_sections.begin())->second;
-        _sections.erase(_sections.begin());
-        delete section;
-    }
-
-    while( ! _includedConfigs.empty() ){
-        SentryConfig* config = *(_includedConfigs.begin());
-        _includedConfigs.erase(_includedConfigs.begin());
-        delete config;
     }
 }
 
@@ -279,6 +286,11 @@ bool sentry::SentryConfig::writeConfig() throw() {
     _ofstream.flush();
     _ofstream.close();
     return true;
+}
+
+void sentry::SentryConfig::reload() throw() {
+    this->_writeAndEmpty();
+    this->_loadAndInit(this->_originalFilename);    
 }
 
 bool sentry::SentryConfig::isLoading(string configfile) throw() {
