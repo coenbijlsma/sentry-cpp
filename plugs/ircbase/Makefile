@@ -28,12 +28,16 @@ all: clean
 		./plugs/ircbase/IRCSocketListener.cpp
 		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
 		./plugs/ircbase/MessageQueueListener.cpp
+		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
+		./plugs/ircbase/CheckUserJoinCommand.cpp
+		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
+		./plugs/ircbase/AutoOpCommand.cpp
 		g++ -g3 -shared -Wl,-soname,libircbase.so.1 -o ./libircbase.so.1.0.0 \
 		./SentryConfigSection.o ./SentryConfig.o ./EnqueueMessageCommand.o \
 		IRCSocket.o ./IRCBase.o ./Logger.o ./StringTokenizer.o \
 		./BufferedSocketReader.o ./BufferedSocketWriter.o ./GenericIRCBaseException.o \
 		./IRCMessagePrefix.o ./IRCMessage.o ./IRCBaseHookPoint.o ./IRCSocketListener.o \
-		./MessageQueueListener.o -lc -lthread
+		./MessageQueueListener.o ./CheckUserJoinCommand.o ./AutoOpCommand.o -lc -lthread
 		@mv ./libircbase.so.1.0.0 ./plugs/
 
 clean:

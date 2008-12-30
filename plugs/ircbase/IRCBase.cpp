@@ -9,9 +9,12 @@
 #include "IRCBase.h"
 #include "IRCBaseHookPoint.h"
 #include "Logger.h"
-#include "EnqueueMessageCommand.h"
 #include "IRCMessage.h"
 #include "IPluginCommand.h"
+
+#include "EnqueueMessageCommand.h"
+#include "CheckUserJoinCommand.h"
+#include "AutoOpCommand.h"
 
 using sentry::Logger;
 
@@ -35,6 +38,27 @@ IRCBase::IRCBase(string name) throw(string){
     
     _setupCommands();
     _setupHookpoints();
+
+    /*
+     * Attach the check_user_join command to the post_receive hookpoint.
+     */
+    IPluginCommand* check_user_join = this->findCommand("ircbase.check_user_join");
+    if(check_user_join){
+        IHookPoint* post_receive = this->findHookPoint("ircbase.post_receive");
+
+        if(post_receive){
+            post_receive->attach(check_user_join);
+        }
+    }
+
+    IPluginCommand* auto_op = this->findCommand("ircbase.auto_op");
+    if(auto_op){
+        IHookPoint* post_join_user = this->findHookPoint("ircbase.post_join_user");
+
+        if(post_join_user){
+            post_join_user->attach(auto_op);
+        }
+    }
 }
 
 IRCBase::~IRCBase(){
@@ -73,7 +97,7 @@ IRCBase::~IRCBase(){
 /* create the socket-listener thread */
 void IRCBase::_createListenerThread(){
     try{
-        _listener = new IRCSocketListener(this->_socket, this->_findHookPoint("ircbase.post_receive"));
+        _listener = new IRCSocketListener(this->_socket, this->findHookPoint("ircbase.post_receive"));
         _listenerThread = new Thread( _listener );
         _listenerThread->start();
         _listenerThread->detach();
@@ -98,17 +122,23 @@ void IRCBase::_createQueueListenerThread(){
 /* Setup the commands this plug-in provides */
 void IRCBase::_setupCommands(){
     IPluginCommand* enqueue_message = new EnqueueMessageCommand(this);
+    IPluginCommand* check_user_join = new CheckUserJoinCommand(this);
+    IPluginCommand* auto_op = new AutoOpCommand(this, this->_config);
 
     // do stuff ??
 
     _commands.push_back(enqueue_message);
+    _commands.push_back(check_user_join);
+    _commands.push_back(auto_op);
 }
 
 /* Setup the hookpoints this plug-in provides */
 void IRCBase::_setupHookpoints(){
     IHookPoint* post_receive = new IRCBaseHookPoint("ircbase.post_receive");
+    IHookPoint* post_join_user = new IRCBaseHookPoint("ircbase.post_join_user");
 
     _providingHookPoints.push_back(post_receive);
+    _providingHookPoints.push_back(post_join_user);
 }
 
 /* Connects to the server with the provided data of the configfile */
@@ -133,7 +163,7 @@ bool IRCBase::_connect(){
 }
 
 /* Finds a hookpoint by name */
-IHookPoint* IRCBase::_findHookPoint(string name){
+IHookPoint* IRCBase::findHookPoint(string name){
     for(vector<IHookPoint*>::iterator it = _providingHookPoints.begin(); it != _providingHookPoints.end(); it++){
         IHookPoint* hookpoint = *it;
         if(hookpoint->getName() == name){

@@ -115,11 +115,6 @@ private:
      * and tries to register at the channel.
      */
     bool _connect();
-
-    /**
-     * Finds a hookpoint by name
-     */
-    IHookPoint* _findHookPoint(string name);
     
 public:
 
@@ -179,6 +174,11 @@ public:
      * command is not found.
      */
     IPluginCommand* findCommand(string name);
+
+    /**
+     * Finds a hookpoint by name
+     */
+    IHookPoint* findHookPoint(string name);
 
     /**
      * @return bool Whether this plug-in is currently active.

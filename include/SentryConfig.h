@@ -65,8 +65,8 @@ namespace sentry {
 
             /*
              * Below are variables to support some basic include functionality.
-             * To let it all work nicely, there are a few rules when you
-             * include other config files:
+             * To let it all work nicely, there are a few rules you have to OBEY
+             * when you include other config files:
              * - Variables defined once are available everywhere;
              * - If a variable is defined in both the including file and the
              *   included file, the variable in the including file is

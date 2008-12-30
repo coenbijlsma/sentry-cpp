@@ -260,7 +260,7 @@ bool sentry::SentryConfig::writeConfig() throw() {
     _ofstream.open(_filename.c_str(), ios_base::app);
 
     // write the includes
-    for(int i = 0; i < _includedConfigs.size(); i++){
+    for(unsigned int i = 0; i < _includedConfigs.size(); i++){
         SentryConfig* config = _includedConfigs.at(i);
         _ofstream << SentryConfig::_INCLUDE_DIRECTIVE << " " << config->getOriginalFileName() << endl;
     }
