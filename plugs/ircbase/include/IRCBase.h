@@ -31,6 +31,7 @@
 #include "SentryConfig.h"
 
 #include "IRCSocketListener.h"
+#include "MessageQueueListener.h"
 
 using sentry::IPlugin;
 using sentry::IPluginProvider;
@@ -68,16 +69,18 @@ private:
      *                          PRIVATE VARIABLES
      -------------------------------------------------------------------------*/
 
-    IRCSocketListener* _socketListener;
     IPluginProvider* _provider;
     string _name;
     vector<IHookPoint*> _providingHookPoints;
     vector<string> _dependencies;
     vector<IPluginCommand*> _commands;
     vector<string> _messageQueue; // queue of messages to be sent over the socket
-    Thread* _listener; // listens for new messages on the socket
-    pthread_t _queueListener; // looks if there is anything in the messagequeue and sends it to the socket
-    bool _doListen;
+
+    /* Thread stuff */
+    IRCSocketListener* _listener;
+    MessageQueueListener* _queueListener;    
+    Thread* _listenerThread; // listens for new messages on the socket
+    Thread* _queueListenerThread; // looks if there is anything in the messagequeue and sends it to the socket
     
     IRCSocket* _socket;
 
@@ -86,17 +89,6 @@ private:
     /*--------------------------------------------------------------------------
      *                          PRIVATE METHODS
      -------------------------------------------------------------------------*/
-
-    /**
-     * Starts the thread that looks in the _messageQueue for messages to be
-     * sent.
-     */
-    static void* __queueListen(void* ptr);
-
-    /**
-     * Does the actual looking in the _messageQueue
-     */
-    void _queueListen();
 
     /**
      * Creates the thread that listens for incoming messages

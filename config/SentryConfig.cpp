@@ -20,25 +20,46 @@
 #include "Logger.h"
 #include <vector>
 
+#include <limits.h> /* For realpath */
+#include <stdlib.h> /* For realpath */
+
 using std::endl;
 using std::ios_base;
 using std::ifstream;
 using std::vector;
 
+vector<string> sentry::SentryConfig::_loadingConfigs;
+string sentry::SentryConfig::_INCLUDE_DIRECTIVE("!include");
+
 sentry::SentryConfig::SentryConfig(string filename) throw(string){
-    _filename = filename;
+    char* rpath = realpath(filename.c_str(), NULL);
+    if(rpath){
+        string path(rpath);
+        free(rpath);
 
-    ifstream _ifstream(_filename.c_str(), ios_base::in);
+        if(SentryConfig::isLoading(path)){
+            throw string("Configfile " + path + " already loading (included in " + filename + " ), possible recursion?");
+        }else{
+            SentryConfig::_loadingConfigs.push_back(path);
+        }
+        _filename = path;
+        _originalFilename = filename;
 
-    if( ! _ifstream.is_open()){
-        Logger::log("Config not found!", Logger::LOG_FATAL);
-        throw string("Config file not found (was looking for " + filename + ")");
+        ifstream _ifstream(path.c_str(), ios_base::in);
+
+        if( ! _ifstream.is_open()){
+            throw string("Config file not found (was looking for " + path + ")");
+        }
+
+        _ifstream.close();
+        _init();
+        _filename = path;
+
+        SentryConfig::_removeLoadingConfig(path);
+    }else{
+        throw string("Error while looking up the realpath for " + filename);
     }
-
-    _ifstream.close();
-    _init();
-    _filename = filename;
-
+    
 }
 
 sentry::SentryConfig::~SentryConfig() throw(){
@@ -48,6 +69,12 @@ sentry::SentryConfig::~SentryConfig() throw(){
         SentryConfigSection* section = (_sections.begin())->second;
         _sections.erase(_sections.begin());
         delete section;
+    }
+
+    while( ! _includedConfigs.empty() ){
+        SentryConfig* config = *(_includedConfigs.begin());
+        _includedConfigs.erase(_includedConfigs.begin());
+        delete config;
     }
 }
 
@@ -62,6 +89,7 @@ void sentry::SentryConfig::_init() throw(string) {
     }
 
     string line;
+    SentryConfig* included = 0;
     SentryConfigSection* section = 0;
     bool inSection = false;
     vector<string> tempComment;
@@ -73,13 +101,27 @@ void sentry::SentryConfig::_init() throw(string) {
 
             // create a new section if one is found
             if( ! inSection ){
-                section = new SentryConfigSection(line);
-                inSection = true;
 
-                // add the comments to the section, if any
-                if(tempComment.size() > 0){
-                    section->addAllComment(tempComment);
-                    tempComment.clear();
+                // Check if maybe it's an include
+                StringTokenizer st(line, ' ');
+                if(st.count() == 2){
+                    string first = st.next();
+                    string second = st.next();
+
+                    if(first == SentryConfig::_INCLUDE_DIRECTIVE){
+                        included = new SentryConfig(second);
+                        _includedConfigs.push_back( included );
+                    }
+                    
+                }else{
+                    section = new SentryConfigSection(line);
+                    inSection = true;
+
+                    // add the comments to the section, if any
+                    if(tempComment.size() > 0){
+                        section->addAllComment(tempComment);
+                        tempComment.clear();
+                    }
                 }
             }else{
                 if( line.at(0) != '{' && line.at(0) != '}'){
@@ -158,8 +200,24 @@ void sentry::SentryConfig::_writeSection(ofstream* fs, SentryConfigSection* sect
     (*fs) << endl;
 }
 
+string sentry::SentryConfig::getFileName() throw(){
+    return _filename;
+}
+
+string sentry::SentryConfig::getOriginalFileName() throw() {
+    return _originalFilename;
+}
+
 /* Returns the section that has the given name */
 sentry::SentryConfigSection* sentry::SentryConfig::getSection(string name) throw() {
+    for(unsigned int i = 0; i < _includedConfigs.size(); i++){
+        SentryConfig* config = _includedConfigs.at(i);
+        SentryConfigSection* section = config->getSection(name);
+        if(section){
+            return section;
+        }
+    }
+    
     map<string, SentryConfigSection*>::iterator it = _sections.find(name);
 
     if(it == _sections.end()){
@@ -201,6 +259,12 @@ bool sentry::SentryConfig::writeConfig() throw() {
 
     _ofstream.open(_filename.c_str(), ios_base::app);
 
+    // write the includes
+    for(int i = 0; i < _includedConfigs.size(); i++){
+        SentryConfig* config = _includedConfigs.at(i);
+        _ofstream << SentryConfig::_INCLUDE_DIRECTIVE << " " << config->getOriginalFileName() << endl;
+    }
+
     map<string, SentryConfigSection*>::iterator it;
 
     // write all the sections
@@ -215,4 +279,25 @@ bool sentry::SentryConfig::writeConfig() throw() {
     _ofstream.flush();
     _ofstream.close();
     return true;
+}
+
+bool sentry::SentryConfig::isLoading(string configfile) throw() {
+    for(vector<string>::iterator it = SentryConfig::_loadingConfigs.begin(); 
+        it != SentryConfig::_loadingConfigs.end(); it++ ){
+
+            if( *(it) == configfile ){
+                return true;
+            }
+    }
+    return false;
+}
+
+void sentry::SentryConfig::_removeLoadingConfig(string filename) throw() {
+    for(unsigned int i = 0; i < SentryConfig::_loadingConfigs.size(); i++){
+
+        string current = SentryConfig::_loadingConfigs.at(i);
+        if( current ==  filename ){
+            SentryConfig::_loadingConfigs.erase(SentryConfig::_loadingConfigs.begin() + i);
+        }
+    }
 }

@@ -44,6 +44,8 @@ namespace sentry {
     class SentryConfig {
     private:
             string _filename;
+            string _originalFilename;
+
             map<string, SentryConfigSection*> _sections;
 
             /*
@@ -61,6 +63,42 @@ namespace sentry {
              */
             void _writeSection(ofstream* fs, SentryConfigSection* section) throw(string);
 
+            /*
+             * Below are variables to support some basic include functionality.
+             * To let it all work nicely, there are a few rules when you
+             * include other config files:
+             * - Variables defined once are available everywhere;
+             * - If a variable is defined in both the including file and the
+             *   included file, the variable in the including file is
+             *   overwritten.
+             * - You can NOT declare configsections more then once
+             * - An include directive must look like this: !include file.conf
+             * - An include directive may only occur outside of a configsection
+             * - If an include directive does occur inside a configsection,
+             *   it's stored as a setting and no file is included.
+             */
+
+            /**
+             * Contains the config files included in this file.
+             */
+            vector<SentryConfig*> _includedConfigs;
+
+            /**
+             * The include directive (which is !include )
+             */
+            static string _INCLUDE_DIRECTIVE;
+
+            /**
+             * Contains the names of the config files that are currently
+             * loading, in order to prevent recursive loading of config files.
+             */
+            static vector<string> _loadingConfigs;
+
+            /**
+             * Removes a configfile from the list of loading configs, if it
+             * exists there.
+             */
+            static void _removeLoadingConfig(string filename) throw();
     public:
 
             /*
@@ -83,6 +121,16 @@ namespace sentry {
              * their destructors.
              */
             virtual ~SentryConfig() throw();
+
+            /**
+             * Returns the filename of the configfile
+             */
+            string getFileName() throw();
+
+            /**
+             * Returns the original filename that is not converted to a realpath
+             */
+            string getOriginalFileName() throw();
 
             /*
              * Looks for the requested SentryConfigSection.
@@ -114,6 +162,11 @@ namespace sentry {
              * to work on that, promise.
              */
             bool writeConfig() throw();
+
+            /**
+             * Returns whether the given config is already loading.
+             */
+            static bool isLoading(string configfile) throw();
 
     };
 }

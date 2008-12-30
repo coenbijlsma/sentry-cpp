@@ -18,7 +18,6 @@ IRCSocketListener::IRCSocketListener(IRCSocket* socket, IHookPoint* hookpoint){
     _socket = socket;
     _hookpoint = hookpoint;
     _doListen = false;
-    Logger::log("SOCKET HOST: " + _socket->getHost(), Logger::LOG_INFO);
 }
 
 IRCSocketListener::~IRCSocketListener(){
@@ -26,7 +25,6 @@ IRCSocketListener::~IRCSocketListener(){
 }
 
 void IRCSocketListener::run(){
-    Logger::log("IRCSocketListener::run()", Logger::LOG_INFO);
     _doListen = true;
     
     while(_doListen){
@@ -40,9 +38,8 @@ void IRCSocketListener::run(){
 
         if(message.size() > 0){
             Logger::log(message, Logger::LOG_INFO);
-            /*
+            
             if(_hookpoint){
-                Logger::log(message, Logger::LOG_INFO);
                 map<string, IPluginCommand*> commands = _hookpoint->getAttachedPluginCommands();
                 vector<string> params;
                 params.push_back(message);
@@ -52,8 +49,6 @@ void IRCSocketListener::run(){
                     command->execute(params);
                 }
             }
-             */
         }
     }
-    Logger::log("Done listening", Logger::LOG_INFO);
 }

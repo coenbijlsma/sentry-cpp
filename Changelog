@@ -1,6 +1,10 @@
+2008-12-30
+    * -ircbase- removed pthread_t code out of IRCBase and used my libthread
+      instead.
+    * -ircbase- Threads are nou created when a plug-in is activated.
+
 2008-12-25
     * -ircbase- Fixed SIGSEGV in IRCMessage::_init() because the
       IRCMessagePrefix was not set to 0 if the raw string contains no prefix.
-
     * -ircbase- Created BufferedSocketReader and BufferedSocketWriter to handle
       network traffic.
