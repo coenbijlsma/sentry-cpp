@@ -51,6 +51,9 @@ IRCBase::IRCBase(string name) throw(string){
         }
     }
 
+    /**
+     * Attach the post_join_user command to the auto_op hookpoint
+     */
     IPluginCommand* auto_op = this->findCommand("ircbase.auto_op");
     if(auto_op){
         IHookPoint* post_join_user = this->findHookPoint("ircbase.post_join_user");

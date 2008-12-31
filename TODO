@@ -12,6 +12,7 @@
 -- IRCBASE --
 * Implement a command identifier ( maybe static # at first? )
 * Implement a #reload command that reloads the config.
+* Implement a PONG command as reply on PING
 
 -- MYSQL --
 * Create it

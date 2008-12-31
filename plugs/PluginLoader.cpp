@@ -19,6 +19,7 @@ void* sentry::PluginLoader::_getLib(string libpath) throw (NoSuchLibraryExceptio
 /* Loads the plug-in from the given path */
 sentry::IPlugin* sentry::PluginLoader::loadPlugin(string libpath, IPluginProvider* provider) throw (NoSuchLibraryException, NoSuchSymbolException){
     void* lib = _getLib(libpath);
+
     
     /* Load the create symbol */
     create_plugin_t* create_plugin = (create_plugin_t*) dlsym(lib, "create_plugin");
@@ -39,6 +40,7 @@ sentry::IPlugin* sentry::PluginLoader::loadPlugin(string libpath, IPluginProvide
         if(provider == 0){
             Logger::log("PluginProvider is NULL, unloading plugin", Logger::LOG_ERROR);
             delete plugin;
+            dlclose(lib);
             return (IPlugin*)0;
         }else{
             plugin->setProvider(provider);

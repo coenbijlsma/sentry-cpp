@@ -106,10 +106,12 @@ sentry::Sentry::context_t sentry::Sentry::getContext(){
 }
 
 void sentry::Sentry::loadPlugins(){
-    string plugindir(_config->getValue("application", "plugindir") + "/");
+    string plugindir(_config->getValue("application", "plugindir"));
     if(plugindir == ""){
         Logger::log("Plugin directory not in config.", Logger::LOG_FATAL);
         exit(Sentry::EXIT_NO_PLUGIN_DIR);
+    }else{
+        plugindir += "/";
     }
 
     vector<string> files = _getPluginLibNames(plugindir);
@@ -117,7 +119,7 @@ void sentry::Sentry::loadPlugins(){
     /**
      * Load the plug-ins
      */
-    for(int i = 0; i < files.size(); i++){
+    for(unsigned int i = 0; i < files.size(); i++){
 	try{
 	    string pluginfile = files.at(i);
 	    IPlugin* plugin = PluginLoader::loadPlugin(pluginfile, this);
