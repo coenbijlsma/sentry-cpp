@@ -14,34 +14,37 @@
  * You should have received a copy of the GNU General Public License
  * along with Sentry.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef CONFIGRELOADEXCEPTION_H
+#define	CONFIGRELOADEXCEPTION_H
 
-#ifndef AUTOOPCOMMAND_H
-#define	AUTOOPCOMMAND_H
-
-#include "IRCBaseAbstractCommand.h"
-#include "IRCBase.h"
-#include "SentryConfig.h"
 #include <string>
-#include <map>
-#include <vector>
-
-using sentry::SentryConfig;
 
 using std::string;
-using std::map;
-using std::vector;
 
-class AutoOpCommand : public IRCBaseAbstractCommand {
-private:
-    SentryConfig* _config;
-    
-public:
+namespace sentry {
+    /**
+     * @brief Exception class in case reloading the SentryConfig fails
+     * @author $Author$
+     * @copyright Copyright (C) 2008 by Coen Bijlsma
+     * @since 2008-12-31
+     * @changed $Date$
+     * @version $Id$
+     * @url $HeadURL$
+     */
+    class ConfigReloadException {
+    private:
+        string _what;
 
-    AutoOpCommand(IRCBase* plugin, SentryConfig* config);
-    virtual ~AutoOpCommand();    
+    public:
+        ConfigReloadException();
+        ConfigReloadException(string what);
+        ~ConfigReloadException();
+        
+        string what() throw();
 
-    void execute(vector<string> params);
-};
+        void setWhat(string what) throw();
+    };
+}
 
-#endif	/* AUTOOPCOMMAND_H */
+#endif	/* CONFIGRELOADEXCEPTION_H */
 

@@ -58,6 +58,8 @@ public:
     bool isActive();
 
     bool activate();
+
+    bool reloadConfig();
 };
 
 //typedef IPlugin* create_plugin_t();

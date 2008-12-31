@@ -82,10 +82,11 @@ sentry::Sentry::~Sentry() throw(){
     }
 
     delete _config;
-        
-    IHookPoint* post_startup = findHookPoint("core.post_startup");
-    if(post_startup != 0){
-        delete post_startup;
+
+    /* elete the hookpoints */
+    for(map<string, IHookPoint*>::iterator it = _hookpoints.begin(); it != _hookpoints.end(); it++){
+        IHookPoint* hookpoint = it->second;
+        delete hookpoint;
     }
 
 }
@@ -107,7 +108,7 @@ sentry::Sentry::context_t sentry::Sentry::getContext(){
 
 void sentry::Sentry::loadPlugins(){
     string plugindir(_config->getValue("application", "plugindir"));
-    if(plugindir == ""){
+    if(plugindir.empty()){
         Logger::log("Plugin directory not in config.", Logger::LOG_FATAL);
         exit(Sentry::EXIT_NO_PLUGIN_DIR);
     }else{

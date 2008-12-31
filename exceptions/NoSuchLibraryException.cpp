@@ -17,13 +17,26 @@
 
 #include "NoSuchLibraryException.h" 
 
-const char* sentry::NoSuchLibraryException::what() const throw(){
-    if(_what == 0){
+sentry::NoSuchLibraryException::NoSuchLibraryException(){
+
+}
+
+sentry::NoSuchLibraryException::NoSuchLibraryException(string what){
+    _what = what;
+
+}
+
+sentry::NoSuchLibraryException::~NoSuchLibraryException(){
+
+}
+
+string sentry::NoSuchLibraryException::what() throw(){
+    if(_what.empty()){
         return "Library not found.";
     }
     return _what;
 }
 
 void sentry::NoSuchLibraryException::setWhat(string what) throw() {
-    _what = what.c_str();
+    _what = what;
 }

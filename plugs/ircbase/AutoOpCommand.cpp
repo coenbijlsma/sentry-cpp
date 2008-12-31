@@ -10,42 +10,14 @@ using sentry::SentryConfigSection;
 using sentry::StringTokenizer;
 using sentry::Logger;
 
-AutoOpCommand::AutoOpCommand(IRCBase* plugin, SentryConfig* config){
-    _plugin = plugin;
-    _config = config;
+AutoOpCommand::AutoOpCommand(IRCBase* plugin, SentryConfig* config) 
+    : IRCBaseAbstractCommand(plugin), _config(config) {
+
     _name = "ircbase.auto_op";
 }
 
 AutoOpCommand::~AutoOpCommand(){
 
-}
-
-IPlugin* AutoOpCommand::getPlugin(){
-    return _plugin;
-}
-
-string AutoOpCommand::getName(){
-    return _name;
-}
-
-map<string, IHookPoint*> AutoOpCommand::getHookPoints(){
-    return _hookpoints;
-}
-
-void AutoOpCommand::addAttachedHookPoint(IHookPoint* hookpoint){
-    if(hookpoint == 0){ return; }
-
-    map<string, IHookPoint*>::iterator hp = _hookpoints.find(hookpoint->getName());
-    if(hp != _hookpoints.end() ){ return; }
-    _hookpoints[hookpoint->getName()] = hookpoint;
-}
-
-void AutoOpCommand::removeAttachedHookPoint(IHookPoint* hookpoint){
-    if(hookpoint == 0){ return; }
-
-    map<string, IHookPoint*>::iterator hp = _hookpoints.find(hookpoint->getName());
-    if(hp == _hookpoints.end() ){ return; }
-    _hookpoints.erase(hp);
 }
 
 void AutoOpCommand::execute(vector<string> params){

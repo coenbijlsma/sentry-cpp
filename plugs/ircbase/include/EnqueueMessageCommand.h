@@ -18,27 +18,18 @@
 #ifndef ENQUEUEMESSAGECOMMAND_H
 #define	ENQUEUEMESSAGECOMMAND_H
 
-#include "IPluginCommand.h"
-#include "IHookPoint.h"
 #include "IRCBase.h"
+#include "IRCBaseAbstractCommand.h"
 #include <string>
-#include <map>
 #include <vector>
 
 using sentry::IPluginCommand;
 using sentry::IHookPoint;
 
 using std::string;
-using std::map;
 using std::vector;
 
-class EnqueueMessageCommand : public IPluginCommand {
-private:
-
-    IRCBase* _plugin;
-    string _name;
-    map<string, IHookPoint*> _hookpoints;
-    
+class EnqueueMessageCommand : public IRCBaseAbstractCommand {
 public:
 
     /**
@@ -46,19 +37,6 @@ public:
      */
     EnqueueMessageCommand(IRCBase* plugin);
     virtual ~EnqueueMessageCommand();
-
-    IPlugin* getPlugin();
-
-    /**
-     * Returns the name of this command (ircbase.enqueue_message)
-     */
-    string getName();
-
-    map<string, IHookPoint*> getHookPoints();
-
-    void addAttachedHookPoint(IHookPoint* hookpoint);
-
-    void removeAttachedHookPoint(IHookPoint* hookpoint);
 
     /**
      * Executes the command, effectively adding

@@ -18,26 +18,16 @@
 #ifndef CHECKUSERJOINCOMMAND_H
 #define	CHECKUSERJOINCOMMAND_H
 
-#include "IPluginCommand.h"
-#include "IHookPoint.h"
 #include "IRCBase.h"
+#include "IRCBaseAbstractCommand.h"
 #include <string>
-#include <map>
 #include <vector>
 
-using sentry::IPluginCommand;
-using sentry::IHookPoint;
-
 using std::string;
-using std::map;
 using std::vector;
 
-class CheckUserJoinCommand : public IPluginCommand {
+class CheckUserJoinCommand : public IRCBaseAbstractCommand {
 private:
-
-    IRCBase* _plugin;
-    string _name;
-    map<string, IHookPoint*> _hookpoints;
 
     static string _JOIN_COMMAND;
 
@@ -45,19 +35,6 @@ public:
 
     CheckUserJoinCommand(IRCBase* plugin);
     virtual ~CheckUserJoinCommand();
-
-    IPlugin* getPlugin();
-
-    /**
-     * Returns the name of this command (ircbase.enqueue_message)
-     */
-    string getName();
-
-    map<string, IHookPoint*> getHookPoints();
-
-    void addAttachedHookPoint(IHookPoint* hookpoint);
-
-    void removeAttachedHookPoint(IHookPoint* hookpoint);
 
     /**
      * Executes the command, checking if the first param contains a JOIN

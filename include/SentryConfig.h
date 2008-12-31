@@ -18,12 +18,14 @@
 #define SENTRYCONFIG_H
 
 #include "SentryConfigSection.h"
+#include "ConfigReloadException.h"
 #include <iostream>
 #include <fstream>
 #include <map>
 #include <string>
 
 using sentry::SentryConfigSection;
+using sentry::ConfigReloadException;
 
 using std::string;
 using std::map;
@@ -63,9 +65,9 @@ namespace sentry {
              */
             void _writeSection(ofstream* fs, SentryConfigSection* section) throw(string);
 
-            void _writeAndEmpty() throw();
+            bool _writeAndEmpty() throw();
 
-            void _loadAndInit(string filename) throw();
+            void _loadAndInit(string filename) throw(string);
 
             /*
              * Below are variables to support some basic include functionality.
@@ -170,7 +172,7 @@ namespace sentry {
             /**
              * Reads the config file(s) again.
              */
-            void reload() throw();
+            void reload() throw(ConfigReloadException);
 
             /**
              * Returns whether the given config is already loading.

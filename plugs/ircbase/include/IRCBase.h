@@ -192,6 +192,11 @@ public:
     bool activate();
 
     /**
+     * Reloads the config for this plug-in
+     */
+    bool reloadConfig();
+
+    /**
      * Enqueues the given string to send it later on. This function is actually
      * called by the EnqueueMessageCommand when it is executed.
      * @param string The message in RFC 1459 format to be enqueued.

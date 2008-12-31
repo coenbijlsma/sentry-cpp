@@ -82,6 +82,10 @@ bool TestPlugin::activate(){
     return true;
 }
 
+bool TestPlugin::reloadConfig(){
+    return true;
+}
+
 extern "C" IPlugin* create_plugin(){
     string name("testplugin");
     return (IPlugin*)new TestPlugin(name);

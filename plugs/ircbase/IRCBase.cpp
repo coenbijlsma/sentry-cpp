@@ -11,18 +11,21 @@
 #include "Logger.h"
 #include "IRCMessage.h"
 #include "IPluginCommand.h"
+#include "ConfigReloadException.h"
 
 #include "EnqueueMessageCommand.h"
 #include "CheckUserJoinCommand.h"
 #include "AutoOpCommand.h"
 
 using sentry::Logger;
+using sentry::ConfigReloadException;
 
 using libthread::Runnable;
 using libthread::ThreadException;
 
 IRCBase::IRCBase(string name) throw(string){
 
+    _socket = 0;
     Logger::setDestination(Logger::DEST_STDOUT);
 
     _name = name;
@@ -73,6 +76,10 @@ IRCBase::~IRCBase(){
 
     for(vector<IPluginCommand*>::iterator it = _commands.begin(); it != _commands.end(); it++){
         delete *it;
+    }
+
+    if(_config){
+        delete _config;
     }
 
     if(_listener){
@@ -236,6 +243,16 @@ bool IRCBase::activate(){
         return true;
     }
     return false;
+}
+
+bool IRCBase::reloadConfig(){
+    try{
+        _config->reload();
+        return true;
+    }catch(ConfigReloadException ex){
+        Logger::log(ex.what(), Logger::LOG_WARNING);
+        return false;
+    }
 }
 
 void IRCBase::enqueue(string message){

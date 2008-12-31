@@ -14,34 +14,46 @@
  * You should have received a copy of the GNU General Public License
  * along with Sentry.  If not, see <http://www.gnu.org/licenses/>.
  */
+#ifndef IRCBASEABSTRACTCOMMAND_H
+#define	IRCBASEABSTRACTCOMMAND_H
 
-#ifndef AUTOOPCOMMAND_H
-#define	AUTOOPCOMMAND_H
-
-#include "IRCBaseAbstractCommand.h"
+#include "IPluginCommand.h"
+#include "IHookPoint.h"
 #include "IRCBase.h"
-#include "SentryConfig.h"
 #include <string>
 #include <map>
 #include <vector>
 
-using sentry::SentryConfig;
-
+using sentry::IPluginCommand;
+using sentry::IHookPoint;
 using std::string;
 using std::map;
 using std::vector;
 
-class AutoOpCommand : public IRCBaseAbstractCommand {
-private:
-    SentryConfig* _config;
-    
+class IRCBaseAbstractCommand : public IPluginCommand {
+protected:
+
+    IRCBase* _plugin;
+    string _name;
+    map<string, IHookPoint*> _hookpoints;
+
 public:
 
-    AutoOpCommand(IRCBase* plugin, SentryConfig* config);
-    virtual ~AutoOpCommand();    
+    IRCBaseAbstractCommand(IRCBase* plugin);
+    virtual ~IRCBaseAbstractCommand();
 
-    void execute(vector<string> params);
+    IPlugin* getPlugin();
+
+    string getName();
+
+    map<string, IHookPoint*> getHookPoints();
+
+    void addAttachedHookPoint(IHookPoint* hookpoint);
+
+    void removeAttachedHookPoint(IHookPoint* hookpoint);
+
+    virtual void execute(vector<string> params) =0;
 };
 
-#endif	/* AUTOOPCOMMAND_H */
+#endif	/* IRCBASEABSTRACTCOMMAND_H */
 

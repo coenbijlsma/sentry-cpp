@@ -17,10 +17,8 @@
 #ifndef NOSUCHSYMBOLEXCEPTION_H
 #define NOSUCHSYMBOLEXCEPTION_H
 
-#include <exception>
 #include <string>
 
-using std::exception;
 using std::string;
 
 namespace sentry {
@@ -33,13 +31,17 @@ namespace sentry {
      * @version $Id$
      * @url $HeadURL$
      */
-    class NoSuchSymbolException : public exception {
+    class NoSuchSymbolException {
     private:
-        const char* _what;
+        string _what;
 
     public:
 
-        virtual const char* what() const throw();
+        NoSuchSymbolException();
+        NoSuchSymbolException(string what);
+        virtual ~NoSuchSymbolException();
+        
+        string what() throw();
         void setWhat(string what) throw();
     };
 }

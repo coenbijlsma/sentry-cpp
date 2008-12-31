@@ -23,6 +23,14 @@ IRCSocket::~IRCSocket(){
     if(_connected){
         disconnect();
     }
+
+    if(_br){
+        delete _br;
+    }
+
+    if(_bw){
+        delete _bw;
+    }
 }
 
 bool IRCSocket::connected(){

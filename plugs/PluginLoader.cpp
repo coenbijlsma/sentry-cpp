@@ -9,7 +9,9 @@ void* sentry::PluginLoader::_getLib(string libpath) throw (NoSuchLibraryExceptio
     
     if( ! lib ){
         NoSuchLibraryException ex;
-        ex.setWhat(string("Could not load library " + libpath).c_str() ) ;
+        string what("Could not load library ");
+        what += dlerror();
+        ex.setWhat(what) ;
 	throw ex;
     }
     

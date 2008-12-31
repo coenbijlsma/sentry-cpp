@@ -100,6 +100,11 @@ namespace sentry {
          */
         virtual bool activate() =0;
 
+        /**
+         * Reloads the config of the plug-in, if any.
+         */
+        virtual bool reloadConfig() =0;
+
     };
 }
 

@@ -5,46 +5,20 @@
 #include "CheckUserJoinCommand.h"
 #include "IRCMessage.h"
 #include "GenericIRCBaseException.h"
+#include "IRCBaseAbstractCommand.h"
 
 using sentry::Logger;
 
 string CheckUserJoinCommand::_JOIN_COMMAND("JOIN");
 
-CheckUserJoinCommand::CheckUserJoinCommand(IRCBase* plugin){
-    _plugin = plugin;
-    _name = string("ircbase.check_user_join");
+CheckUserJoinCommand::CheckUserJoinCommand(IRCBase* plugin) 
+    : IRCBaseAbstractCommand(plugin) {
+    
+    _name = "ircbase.check_user_join";
 }
 
 CheckUserJoinCommand::~CheckUserJoinCommand(){
 
-}
-
-IPlugin* CheckUserJoinCommand::getPlugin(){
-    return _plugin;
-}
-
-string CheckUserJoinCommand::getName(){
-    return _name;
-}
-
-map<string, IHookPoint*> CheckUserJoinCommand::getHookPoints(){
-    return _hookpoints;
-}
-
-void CheckUserJoinCommand::addAttachedHookPoint(IHookPoint* hookpoint){
-    if(hookpoint == 0){ return; }
-
-    map<string, IHookPoint*>::iterator hp = _hookpoints.find(hookpoint->getName());
-    if(hp != _hookpoints.end() ){ return; }
-    _hookpoints[hookpoint->getName()] = hookpoint;
-}
-
-void CheckUserJoinCommand::removeAttachedHookPoint(IHookPoint* hookpoint){
-    if(hookpoint == 0){ return; }
-
-    map<string, IHookPoint*>::iterator hp = _hookpoints.find(hookpoint->getName());
-    if(hp == _hookpoints.end() ){ return; }
-    _hookpoints.erase(hp);
 }
 
 void CheckUserJoinCommand::execute(vector<string> params){

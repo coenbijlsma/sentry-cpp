@@ -17,10 +17,8 @@
 #ifndef NOSUCHLIBRARYEXCEPTION_H
 #define NOSUCHLIBRARYEXCEPTION_H
 
-#include <exception>
 #include <string>
 
-using std::exception;
 using std::string;
 
 namespace sentry {
@@ -33,13 +31,17 @@ namespace sentry {
      * @version $Id$
      * @url $HeadURL$
      */
-    class NoSuchLibraryException : public exception {
+    class NoSuchLibraryException {
     private:
-        const char* _what;
+        string _what;
 
     public:
 
-        virtual const char* what() const throw();
+        NoSuchLibraryException();
+        NoSuchLibraryException(string what);
+        virtual ~NoSuchLibraryException();
+        
+        string what() throw();
         void setWhat(string what) throw();
     };
 }

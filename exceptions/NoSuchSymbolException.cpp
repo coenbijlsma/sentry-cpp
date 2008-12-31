@@ -17,8 +17,20 @@
 
 #include "NoSuchSymbolException.h" 
 
-const char* sentry::NoSuchSymbolException::what() const throw(){
-    if(_what == 0){
+sentry::NoSuchSymbolException::NoSuchSymbolException(){
+
+}
+
+sentry::NoSuchSymbolException::NoSuchSymbolException(string what){
+    _what = what;
+}
+
+sentry::NoSuchSymbolException::~NoSuchSymbolException(){
+
+}
+
+string sentry::NoSuchSymbolException::what() throw(){
+    if(_what.empty()){
         return "Symbol not found.";
     }
     
@@ -26,5 +38,5 @@ const char* sentry::NoSuchSymbolException::what() const throw(){
 }
 
 void sentry::NoSuchSymbolException::setWhat(string what) throw(){
-    _what = what.c_str();
+    _what = what;
 }

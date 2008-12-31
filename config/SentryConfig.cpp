@@ -39,8 +39,8 @@ sentry::SentryConfig::~SentryConfig() throw(){
     this->_writeAndEmpty();
 }
 
-void sentry::SentryConfig::_writeAndEmpty() throw() {
-    writeConfig();
+bool sentry::SentryConfig::_writeAndEmpty() throw() {
+    bool success = writeConfig();
 
     while( ! _sections.empty() ){
         SentryConfigSection* section = (_sections.begin())->second;
@@ -53,9 +53,11 @@ void sentry::SentryConfig::_writeAndEmpty() throw() {
         _includedConfigs.erase(_includedConfigs.begin());
         delete config;
     }
+
+    return success;
 }
 
-void sentry::SentryConfig::_loadAndInit(string filename) throw() {
+void sentry::SentryConfig::_loadAndInit(string filename) throw(string) {
     char* rpath = realpath(filename.c_str(), NULL);
     if(rpath){
         string path(rpath);
@@ -288,9 +290,15 @@ bool sentry::SentryConfig::writeConfig() throw() {
     return true;
 }
 
-void sentry::SentryConfig::reload() throw() {
-    this->_writeAndEmpty();
-    this->_loadAndInit(this->_originalFilename);    
+void sentry::SentryConfig::reload() throw(ConfigReloadException) {
+    if( ! this->_writeAndEmpty() ){
+        throw ConfigReloadException("Could not write configfile " + this->_filename + ", reloading failed.");
+    }
+    try{
+        this->_loadAndInit(this->_originalFilename);
+    }catch(string error){
+        throw ConfigReloadException(error);
+    }
 }
 
 bool sentry::SentryConfig::isLoading(string configfile) throw() {
