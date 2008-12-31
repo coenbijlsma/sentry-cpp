@@ -36,6 +36,8 @@ all: clean
 		./plugs/ircbase/CheckUserJoinCommand.cpp
 		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
 		./plugs/ircbase/AutoOpCommand.cpp
+		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
+		./plugs/ircbase/PongCommand.cpp
 		g++ -g3 -shared -Wl,-soname,libircbase.so.1 -o ./libircbase.so.1.0.0 \
 		./ConfigReloadException.o \
 		./SentryConfigSection.o ./SentryConfig.o ./IRCBaseAbstractCommand.o \
@@ -43,7 +45,7 @@ all: clean
 		./BufferedSocketReader.o ./BufferedSocketWriter.o ./GenericIRCBaseException.o \
 		./IRCMessagePrefix.o ./IRCMessage.o ./IRCBaseHookPoint.o ./IRCSocketListener.o \
 		./MessageQueueListener.o ./EnqueueMessageCommand.o \
-		./CheckUserJoinCommand.o ./AutoOpCommand.o -lc -lthread
+		./CheckUserJoinCommand.o ./AutoOpCommand.o ./PongCommand.o -lc -lthread
 		@mv ./libircbase.so.1.0.0 ./plugs/
 
 clean:

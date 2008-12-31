@@ -16,6 +16,7 @@
 #include "EnqueueMessageCommand.h"
 #include "CheckUserJoinCommand.h"
 #include "AutoOpCommand.h"
+#include "PongCommand.h"
 
 using sentry::Logger;
 using sentry::ConfigReloadException;
@@ -63,6 +64,18 @@ IRCBase::IRCBase(string name) throw(string){
 
         if(post_join_user){
             post_join_user->attach(auto_op);
+        }
+    }
+
+    /**
+     * Attach the pong command to the post_receive hookpoint
+     */
+    IPluginCommand* pong = this->findCommand("ircbase.pong");
+    if(pong){
+        IHookPoint* post_receive = this->findHookPoint("ircbase.post_receive");
+
+        if(post_receive){
+            post_receive->attach(pong);
         }
     }
 }
@@ -134,12 +147,14 @@ void IRCBase::_setupCommands(){
     IPluginCommand* enqueue_message = new EnqueueMessageCommand(this);
     IPluginCommand* check_user_join = new CheckUserJoinCommand(this);
     IPluginCommand* auto_op = new AutoOpCommand(this, this->_config);
+    IPluginCommand* pong = new PongCommand(this);
 
     // do stuff ??
 
     _commands.push_back(enqueue_message);
     _commands.push_back(check_user_join);
     _commands.push_back(auto_op);
+    _commands.push_back(pong);
 }
 
 /* Setup the hookpoints this plug-in provides */
@@ -257,6 +272,7 @@ bool IRCBase::reloadConfig(){
 
 void IRCBase::enqueue(string message){
     _messageQueue.push_back(message);
+    Logger::log("Enqueued " + message, Logger::LOG_INFO);
 }
 
 extern "C" IPlugin* create_plugin(){
