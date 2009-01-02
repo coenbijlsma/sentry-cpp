@@ -1,3 +1,9 @@
+2009-01-02
+    * Gave the Makefiles a boost so that targets are now automagically detected.
+
+2008-12-31
+    * -ircbase- Created some commands
+    * -core- SentryConfig now supports !include directives
 2008-12-30
     * -ircbase- removed pthread_t code out of IRCBase and used my libthread
       instead.

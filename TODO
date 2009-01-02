@@ -5,14 +5,12 @@
 * Logger::log(...) should not be static
 * Logger has to be extended into a number of subclasses, each with their
   own target (stdout/stderr, file, db, ..)
-* Enable config files to include and/or extend others
 * See where Logger::log can be replaced by an exception
 * Replace throw(string) by a decent exception
 
 -- IRCBASE --
 * Implement a command identifier ( maybe static # at first? )
 * Implement a #reload command that reloads the config.
-* Implement a PONG command as reply on PING
 
 -- MYSQL --
 * Create it

@@ -272,7 +272,6 @@ bool IRCBase::reloadConfig(){
 
 void IRCBase::enqueue(string message){
     _messageQueue.push_back(message);
-    Logger::log("Enqueued " + message, Logger::LOG_INFO);
 }
 
 extern "C" IPlugin* create_plugin(){

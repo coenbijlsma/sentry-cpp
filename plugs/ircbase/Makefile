@@ -1,55 +1,28 @@
-all: clean
-		@echo "Building plugin libircbase.so.1.0.0"
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./exceptions/ConfigReloadException.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./tools/StringTokenizer.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./log/Logger.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./config/SentryConfigSection.cpp ./config/SentryConfig.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/IRCBaseAbstractCommand.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/IRCSocket.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/IRCBase.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/BufferedSocketReader.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/BufferedSocketWriter.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/GenericIRCBaseException.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/IRCMessagePrefix.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/IRCMessage.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/IRCBaseHookPoint.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/IRCSocketListener.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/MessageQueueListener.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/EnqueueMessageCommand.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/CheckUserJoinCommand.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/AutoOpCommand.cpp
-		g++ -g3 -I./include/ -I./plugs/ircbase/include/ -fPIC -g -c -Wall \
-		./plugs/ircbase/PongCommand.cpp
-		g++ -g3 -shared -Wl,-soname,libircbase.so.1 -o ./libircbase.so.1.0.0 \
-		./ConfigReloadException.o \
-		./SentryConfigSection.o ./SentryConfig.o ./IRCBaseAbstractCommand.o \
-		IRCSocket.o ./IRCBase.o ./Logger.o ./StringTokenizer.o \
-		./BufferedSocketReader.o ./BufferedSocketWriter.o ./GenericIRCBaseException.o \
-		./IRCMessagePrefix.o ./IRCMessage.o ./IRCBaseHookPoint.o ./IRCSocketListener.o \
-		./MessageQueueListener.o ./EnqueueMessageCommand.o \
-		./CheckUserJoinCommand.o ./AutoOpCommand.o ./PongCommand.o -lc -lthread
-		@mv ./libircbase.so.1.0.0 ./plugs/
+EXTERNALFILES= $(shell cat ircbase.files )
+FILES= $(shell find ./plugs/ircbase/ -maxdepth 1 -type f -name "*.cpp" )
+PLUGSDIR=./plugs
+SONAME=libircbase.so.1
+LIBNAME= libircbase.so.1.0.0
+CPP= g++
+CPPFLAGS= -g3 -I./include -I./plugs/ircbase/include/ -fPIC -g -c -Wall
+LFLAGS= -g3 -shared -Wl,-soname,$(SONAME) -o ./$(LIBNAME)
+
+all: $(EXTERNALFILES) $(FILES) objects
+		@mv ./$(LIBNAME) $(PLUGSDIR)/
+
+$(EXTERNALFILES):
+		$(CPP) $(CPPFLAGS) $@
+
+$(FILES):
+		$(CPP) $(CPPFLAGS) $@
+
+objects:
+		$(CPP) $(LFLAGS) $(shell ls *.o) -lc -lthread
 
 clean:
 		@if [ -f ./IRCBase.o ]; then rm ./*.o; fi
-		@if [ -f ./plugs/libircbase.so.1.0.0 ]; then rm ./plugs/libircbase.so.1.0.0; fi
 
-.PHONY: all clean
+distclean: clean
+		@if [ -f ./$(PLUGSDIR)/$(LIBNAME) ]; then rm ./$(PLUGSDIR)/$(LIBNAME); fi
+
+.PHONY: all clean distclean $(EXTERNALFILES) $(FILES) objects

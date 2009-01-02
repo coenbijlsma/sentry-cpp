@@ -1,3 +1,4 @@
+PLUGINS=$(shell find ./plugs/ -mindepth 1 -maxdepth 1 -type d -name '[a-zA-Z0-9]*' )
 
 help:
 		@echo "Following options are available:"
@@ -10,7 +11,7 @@ help:
 		@echo "- help		Shows this message."
 		@echo
 		
-all: clean core plugins
+all: core plugins
 
 core:
 		@echo "Building Sentry core"
@@ -27,15 +28,16 @@ testplugin:
 		@if [ -f ./plugs/libtestplugin.so.1.0.0 ]; then rm ./plugs/libtestplugin.so.1.0.0; fi
 		@if [ -d ./plugs ]; then mv libtestplugin.so.1.0.0 ./plugs; fi
 
-ircbase:
-		@make -f ./plugs/ircbase/Makefile
+$(PLUGINS):
+		@make -f $@/Makefile
 
-plugins: testplugin ircbase
+plugins: $(PLUGINS)
 
-clean:
+clean: 
 		@if [ -f ./TestPlugin.o ]; then rm ./TestPlugin.o; fi
-		@if [ -f ./sentry ]; then rm ./sentry; fi
 		@if [ -f ./plugs/libtestplugin.so.1.0.0 ]; then rm ./plugs/libtestplugin.so.1.0.0; fi
-		@make clean -f ./plugs/ircbase/Makefile
 
-.PHONY: help all core plugins testplugin clean ircbase
+distclean: clean
+		@if [ -f ./sentry ]; then rm ./sentry; fi
+
+.PHONY: help all core plugins testplugin clean distclean $(PLUGINS)
