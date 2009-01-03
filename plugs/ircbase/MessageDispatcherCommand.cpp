@@ -39,12 +39,14 @@ void MessageDispatcherCommand::execute(vector<string> params){
             unsigned int minparams = section->getInt(command);
             if(ircmessage.getParams().size() < minparams){
                 Logger::log("Wrong parameter count, discarding message", Logger::LOG_WARNING);
+                return;
             }
         }catch(ConvertException ex){
             Logger::log(ex.what() , Logger::LOG_ERROR );
         }
     }else{
-        Logger::log("Section 'messages' not found, not checking parameter count.", Logger::LOG_WARNING);
+        Logger::log("Section 'messages' not found, discarding message.", Logger::LOG_WARNING);
+        return;
     }
     std::transform(command.begin(), command.end(), command.begin(), ::tolower);
 
