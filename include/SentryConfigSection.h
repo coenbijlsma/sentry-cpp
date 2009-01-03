@@ -20,6 +20,7 @@
 #include <string>
 #include <map>
 #include <vector>
+#include "ConvertException.h"
 
 using std::string;
 using std::map;
@@ -79,6 +80,13 @@ namespace sentry {
              * string is returned.
              */
             string get(string setting);
+
+            /**
+             * Returns the valie of the requested setting as an int (if possible).
+             * If the setting doesn't exist or the value can't be converted
+             * to an int, a ConvertException is thrown.
+             */
+            int getInt(string setting) throw(ConvertException);
 
             /*
              * Sets or creates the setting with the

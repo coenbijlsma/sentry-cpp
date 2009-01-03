@@ -14,30 +14,52 @@
  * You should have received a copy of the GNU General Public License
  * along with Sentry.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef PONGCOMMAND_H
-#define	PONGCOMMAND_H
+#ifndef MESSAGEDISPATCHERCOMMAND_H
+#define	MESSAGEDISPATCHERCOMMAND_H
 
 #include "IRCBaseAbstractCommand.h"
 #include "IRCBase.h"
 #include "SentryConfig.h"
 #include <string>
+#include <map>
 #include <vector>
 
 using sentry::SentryConfig;
 
 using std::string;
+using std::map;
 using std::vector;
 
-class PongCommand : public IRCBaseAbstractCommand {
+/**
+ * @brief This class reads the raw incoming message, and dispatches it to the
+ * correct hookpoint.
+ * @author $Author$
+ * @copyright Copyright (C) 2008 by Coen Bijlsma
+ * @since 2009-01-03
+ * @changed $Date$
+ * @version $Id$
+ * @url $HeadURL$
+ */
+class MessageDispatcherCommand : public IRCBaseAbstractCommand {
 private:
-    
+
+    SentryConfig* _config;
+
 public:
+    MessageDispatcherCommand(IRCBase* plugin, SentryConfig* config);
+    virtual ~MessageDispatcherCommand();
 
-    PongCommand(IRCBase* plugin);
-    ~PongCommand();
-
+    /**
+     * Does the actual dispatching work by executing the commands in the
+     * hookpoints found. The commands executed receive the following parameters
+     * in the order as specified below:
+     * - user
+     * - host
+     * - nick
+     * - other parameters
+     */
     void execute(vector<string> params);
 };
 
-#endif	/* PONGCOMMAND_H */
+#endif	/* MESSAGEDISPATCHERCOMMAND_H */
 

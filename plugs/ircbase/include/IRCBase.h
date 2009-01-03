@@ -115,6 +115,11 @@ private:
      * and tries to register at the channel.
      */
     bool _connect();
+
+    /**
+     * Tries to attach the plugincommand that has the given name to the hookpoint.
+     */
+    bool _attachTo(string plugincommand, string hookpoint);
     
 public:
 

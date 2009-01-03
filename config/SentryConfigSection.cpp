@@ -16,6 +16,8 @@
  */
 
 #include "SentryConfigSection.h"
+#include <stdlib.h> /* For atoi() */
+#include <errno.h> /* For result of atoi() */
 #include <iostream>
 
 sentry::SentryConfigSection::SentryConfigSection(string name){
@@ -57,6 +59,31 @@ string sentry::SentryConfigSection::get(string setting){
         return string("");
     }
     return _entries[setting];
+}
+
+int sentry::SentryConfigSection::getInt(string setting) throw(ConvertException) {
+    string value = this->get(setting);
+
+    if(value.empty()){
+        throw ConvertException("Requested setting does not exist: " + setting);
+    }
+
+    int i = atoi(value.c_str());
+
+    if(errno){
+        switch(errno){
+            case ERANGE:
+                throw ConvertException("The resulting value was out of range (value was " + value + ")");
+                break;
+            case EINVAL:
+                throw ConvertException("No conversion possible for " + value);
+                break;
+            default:
+                throw ConvertException("Unknown error while converting the value " + value + " to an int.");
+                break;
+        }
+    }
+    return i;
 }
 
 void sentry::SentryConfigSection::set(string setting, string value){

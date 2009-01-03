@@ -19,6 +19,7 @@
 
 #include "SentryConfigSection.h"
 #include "ConfigReloadException.h"
+#include "ConvertException.h"
 #include <iostream>
 #include <fstream>
 #include <map>
@@ -26,6 +27,7 @@
 
 using sentry::SentryConfigSection;
 using sentry::ConfigReloadException;
+//using sentry::ConvertException;
 
 using std::string;
 using std::map;
@@ -138,14 +140,14 @@ namespace sentry {
              */
             string getOriginalFileName() throw();
 
-            /*
+            /**
              * Looks for the requested SentryConfigSection.
              * Returns it if it exists, otherwise returns
              * a (SentryConfigSection*)0 pointer.
              */
             SentryConfigSection* getSection(string name) throw();
 
-            /*
+            /**
              * Tries to locate the requested section and setting.
              * If either doesn't exist, this function returns an
              * empty string.
@@ -154,7 +156,13 @@ namespace sentry {
              */
             string getValue(string section, string setting) throw();
 
-            /*
+            /**
+             * Returns the requested setting, converted to an int.
+             * @see SentryConfig::getValue()
+             */
+            int getIntValue(string section, string setting) throw(ConvertException);
+
+            /**
              * Sets or creates a setting in the requested section.
              * Of the section does not exist, an error occurs.
              * @throws string If the requested section does not
@@ -162,7 +170,7 @@ namespace sentry {
              */
             void setSetting(string section, string setting, string value) throw(string);
 
-            /*
+            /**
              * Tries to write the current config to the configfile.
              * In fact this function always returns true, but I will
              * to work on that, promise.

@@ -1,4 +1,5 @@
 ./exceptions/ConfigReloadException.cpp
+./exceptions/ConvertException.cpp
 ./tools/StringTokenizer.cpp
 ./log/Logger.cpp
 ./config/SentryConfigSection.cpp

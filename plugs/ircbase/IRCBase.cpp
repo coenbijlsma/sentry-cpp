@@ -17,6 +17,7 @@
 #include "CheckUserJoinCommand.h"
 #include "AutoOpCommand.h"
 #include "PongCommand.h"
+#include "MessageDispatcherCommand.h"
 
 using sentry::Logger;
 using sentry::ConfigReloadException;
@@ -44,40 +45,12 @@ IRCBase::IRCBase(string name) throw(string){
     _setupHookpoints();
 
     /*
-     * Attach the check_user_join command to the post_receive hookpoint.
+     * Attach the commands to the hookpoints.
      */
-    IPluginCommand* check_user_join = this->findCommand("ircbase.check_user_join");
-    if(check_user_join){
-        IHookPoint* post_receive = this->findHookPoint("ircbase.post_receive");
-
-        if(post_receive){
-            post_receive->attach(check_user_join);
-        }
-    }
-
-    /**
-     * Attach the post_join_user command to the auto_op hookpoint
-     */
-    IPluginCommand* auto_op = this->findCommand("ircbase.auto_op");
-    if(auto_op){
-        IHookPoint* post_join_user = this->findHookPoint("ircbase.post_join_user");
-
-        if(post_join_user){
-            post_join_user->attach(auto_op);
-        }
-    }
-
-    /**
-     * Attach the pong command to the post_receive hookpoint
-     */
-    IPluginCommand* pong = this->findCommand("ircbase.pong");
-    if(pong){
-        IHookPoint* post_receive = this->findHookPoint("ircbase.post_receive");
-
-        if(post_receive){
-            post_receive->attach(pong);
-        }
-    }
+    this->_attachTo("ircbase.message_dispatcher", "ircbase.post_receive");
+    //this->_attachTo("ircbase.check_user_join", "ircbase.post_receive");
+    this->_attachTo("ircbase.auto_op", "ircbase.post_receive_join");
+    this->_attachTo("ircbase.pong", "ircbase.post_receive_ping");
 }
 
 IRCBase::~IRCBase(){
@@ -117,6 +90,20 @@ IRCBase::~IRCBase(){
     }
 }
 
+bool IRCBase::_attachTo(string plugincommand, string hookpoint){
+    IPluginCommand* command = this->findCommand(plugincommand);
+    if(command){
+        IHookPoint* hp = this->findHookPoint(hookpoint);
+
+        if(hp){
+            hp->attach(command);
+            return true;
+        }
+        return false;
+    }
+    return false;
+}
+
 /* create the socket-listener thread */
 void IRCBase::_createListenerThread(){
     try{
@@ -144,26 +131,50 @@ void IRCBase::_createQueueListenerThread(){
 
 /* Setup the commands this plug-in provides */
 void IRCBase::_setupCommands(){
-    IPluginCommand* enqueue_message = new EnqueueMessageCommand(this);
-    IPluginCommand* check_user_join = new CheckUserJoinCommand(this);
-    IPluginCommand* auto_op = new AutoOpCommand(this, this->_config);
-    IPluginCommand* pong = new PongCommand(this);
-
-    // do stuff ??
-
-    _commands.push_back(enqueue_message);
-    _commands.push_back(check_user_join);
-    _commands.push_back(auto_op);
-    _commands.push_back(pong);
+    _commands.push_back(new EnqueueMessageCommand(this));
+    _commands.push_back(new CheckUserJoinCommand(this));
+    _commands.push_back(new AutoOpCommand(this, this->_config));
+    _commands.push_back(new PongCommand(this));
+    _commands.push_back(new MessageDispatcherCommand(this, this->_config));
 }
 
 /* Setup the hookpoints this plug-in provides */
 void IRCBase::_setupHookpoints(){
-    IHookPoint* post_receive = new IRCBaseHookPoint("ircbase.post_receive");
-    IHookPoint* post_join_user = new IRCBaseHookPoint("ircbase.post_join_user");
-
-    _providingHookPoints.push_back(post_receive);
-    _providingHookPoints.push_back(post_join_user);
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_pass"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_nick"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_user"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_server"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_oper"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_quit"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_squit"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_join"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_part"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_mode"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_topic"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_names"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_list"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_invite"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_kick"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_version"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_stats"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_links"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_time"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_connect"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_trace"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_admin"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_info"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_privmsg"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_notice"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_who"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_whois"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_whowas"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_kill"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_ping"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_pong"));
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_receive_error"));
+    
+    _providingHookPoints.push_back(new IRCBaseHookPoint("ircbase.post_join"));
 }
 
 /* Connects to the server with the provided data of the configfile */

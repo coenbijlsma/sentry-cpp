@@ -18,13 +18,18 @@
 #ifndef IRCMESSAGE_H
 #define	IRCMESSAGE_H
 
+#include <map>
 #include <string>
 #include <vector>
+#include "SentryConfigSection.h"
 #include "IRCMessagePrefix.h"
 #include "GenericIRCBaseException.h"
 
+using std::map;
 using std::string;
 using std::vector;
+
+using sentry::SentryConfigSection;
 
 /**
  * @brief This class represents a message following the RFC 1459 format
@@ -83,13 +88,16 @@ using std::vector;
 class IRCMessage {
 private:
     IRCMessagePrefix* _prefix;
+
     string _command;
     vector<string> _params;
+    unsigned int _minParams;
 
     /**
      * Called if the non-standard constructor is used.
      */
     void _init(string raw) throw(GenericIRCBaseException);
+    
 public:
 
     static string MESSAGE_SEPARATOR;

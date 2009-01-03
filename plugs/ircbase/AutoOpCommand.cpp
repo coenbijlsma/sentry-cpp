@@ -24,14 +24,9 @@ void AutoOpCommand::execute(vector<string> params){
     bool userPresent = false;
     bool channelPresent = false;
 
-    if(params.size() != 4){
-        Logger::log("AutoOpCommand::execute() -- Wrong parameter count (need 4)", Logger::LOG_WARNING);
-        return;
-    }
-
     SentryConfigSection* section = this->_config->getSection("auto_op");
 
-    if(section){
+    if(section && params.size() > 3){
         string user = params.at(0);
         string host = params.at(1);
         string nick = params.at(2);

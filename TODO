@@ -11,6 +11,11 @@
 -- IRCBASE --
 * Implement a command identifier ( maybe static # at first? )
 * Implement a #reload command that reloads the config.
+* Let the IRCSocketListener decide the correct IHookPoint to dispatch to when a
+  message is read.
+* Create those hookpoints.
+* Make CheckUserJoinCommand obsolete
+* Fix IRCMessage::_init() so that the params are added correctly.
 
 -- MYSQL --
 * Create it

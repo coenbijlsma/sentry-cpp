@@ -11,10 +11,11 @@ using sentry::Logger;
 string IRCMessage::MESSAGE_SEPARATOR = "\r\n";
 
 IRCMessage::IRCMessage() throw() {
-
+    this->_minParams = 0;
 }
 
 IRCMessage::IRCMessage(string raw) throw(GenericIRCBaseException) {
+    this->_minParams = 0;
     this->_init(raw);
 }
 
@@ -25,6 +26,8 @@ IRCMessage::~IRCMessage() throw() {
 }
 
 void IRCMessage::_init(string raw) throw(GenericIRCBaseException){
+    bool haveLastParam = false;
+
     if(raw.size() == 0){
         GenericIRCBaseException ex("Cannot initialise empty raw message. Maybe use standard constructor?");
         throw ex;
@@ -43,8 +46,32 @@ void IRCMessage::_init(string raw) throw(GenericIRCBaseException){
     }
     _command = st.next();
 
-    while(st.hasNext()){
-        this->addParam(st.next());
+    if(st.hasNext()){
+        string lastParam;
+
+        while(st.hasNext()){
+            string param = st.next();
+            if( (! param.empty()) && param.at(0) == ':'){
+                if( ! haveLastParam ){
+                    haveLastParam = true;
+                    lastParam = param;
+                }else{
+                    lastParam += " ";
+                    lastParam += param;
+                }
+            }else{
+                if(haveLastParam){
+                    lastParam += " ";
+                    lastParam += param;
+                }else{
+                    this->addParam(param);
+                }
+            }
+        }
+
+        if(haveLastParam){
+            this->addParam(lastParam);
+        }
     }
 }
 

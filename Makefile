@@ -6,8 +6,8 @@ help:
 		@echo "- core		Builds the sentry core;"
 		@echo "- plugins	Builds the available plug-ins;"
 		@echo "- testplugin	Builds the test plug-in;"
-		@echo "- ircbase	Builds the irc-base plug-in;"
-		@echo "- clean		Cleans up the mess;"
+		@echo "- clean		Cleans up the mess but not the sentry executable;"
+		@echo "- distclean	Executes clean and also removes the sentry executable;"
 		@echo "- help		Shows this message."
 		@echo
 		
@@ -18,6 +18,7 @@ core:
 		g++ -g3 -I./include/ -combine ./config/SentryConfigSection.cpp \
 			./config/SentryConfig.cpp ./exceptions/NoSuchLibraryException.cpp \
 			./exceptions/NoSuchSymbolException.cpp ./exceptions/ConfigReloadException.cpp \
+			./exceptions/ConvertException.cpp \
 			./log/Logger.cpp ./plugs/PluginLoader.cpp ./tools/StringTokenizer.cpp \
 			SentryHookPoint.cpp Sentry.cpp main.cpp -ldl -o sentry
 
@@ -40,4 +41,4 @@ clean:
 distclean: clean
 		@if [ -f ./sentry ]; then rm ./sentry; fi
 
-.PHONY: help all core plugins testplugin clean distclean $(PLUGINS)
+.PHONY: help all core testplugin $(PLUGINS) plugins clean distclean

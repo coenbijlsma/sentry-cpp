@@ -14,30 +14,28 @@
  * You should have received a copy of the GNU General Public License
  * along with Sentry.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef PONGCOMMAND_H
-#define	PONGCOMMAND_H
 
-#include "IRCBaseAbstractCommand.h"
-#include "IRCBase.h"
-#include "SentryConfig.h"
-#include <string>
-#include <vector>
+#include "ConvertException.h"
 
-using sentry::SentryConfig;
+sentry::ConvertException::ConvertException(){
 
-using std::string;
-using std::vector;
+}
 
-class PongCommand : public IRCBaseAbstractCommand {
-private:
-    
-public:
+sentry::ConvertException::ConvertException(string what){
+    _what = what;
+}
 
-    PongCommand(IRCBase* plugin);
-    ~PongCommand();
+sentry::ConvertException::~ConvertException(){
 
-    void execute(vector<string> params);
-};
+}
 
-#endif	/* PONGCOMMAND_H */
+string sentry::ConvertException::what() throw() {
+    if(_what.empty()){
+        return "Could not convert value";
+    }
+    return _what;
+}
 
+void sentry::ConvertException::setWhat(string what) throw() {
+    _what = what;
+}

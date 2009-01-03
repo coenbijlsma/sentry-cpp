@@ -245,6 +245,16 @@ string sentry::SentryConfig::getValue(string section, string setting) throw() {
     return sec->get(setting);
 }
 
+int sentry::SentryConfig::getIntValue(string section, string setting) throw(ConvertException){
+    SentryConfigSection* sec = getSection(section);
+
+    if(sec == 0){
+        throw ConvertException("Requested section ["+ section +"] does not exist.");
+    }
+
+    return sec->getInt(setting);
+}
+
 void sentry::SentryConfig::setSetting(string section, string setting, string value) throw(string) {
     SentryConfigSection* sec = getSection(section);
 
